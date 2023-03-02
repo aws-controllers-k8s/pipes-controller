@@ -27,3 +27,635 @@ var (
 	_ = &aws.JSONValue{}
 	_ = ackv1alpha1.AWSAccountID("")
 )
+
+// This structure specifies the VPC subnets and security groups for the task,
+// and whether a public IP address is to be used. This structure is relevant
+// only for ECS tasks that use the awsvpc network mode.
+type AWSVPCConfiguration struct {
+	AssignPublicIP *string   `json:"assignPublicIP,omitempty"`
+	SecurityGroups []*string `json:"securityGroups,omitempty"`
+	Subnets        []*string `json:"subnets,omitempty"`
+}
+
+// The array properties for the submitted job, such as the size of the array.
+// The array size can be between 2 and 10,000. If you specify array properties
+// for a job, it becomes an array job. This parameter is used only if the target
+// is an Batch job.
+type BatchArrayProperties struct {
+	Size *int64 `json:"size,omitempty"`
+}
+
+// The overrides that are sent to a container.
+type BatchContainerOverrides struct {
+	Command              []*string                   `json:"command,omitempty"`
+	Environment          []*BatchEnvironmentVariable `json:"environment,omitempty"`
+	InstanceType         *string                     `json:"instanceType,omitempty"`
+	ResourceRequirements []*BatchResourceRequirement `json:"resourceRequirements,omitempty"`
+}
+
+// The environment variables to send to the container. You can add new environment
+// variables, which are added to the container at launch, or you can override
+// the existing environment variables from the Docker image or the task definition.
+//
+// Environment variables cannot start with "Batch". This naming convention is
+// reserved for variables that Batch sets.
+type BatchEnvironmentVariable struct {
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// An object that represents an Batch job dependency.
+type BatchJobDependency struct {
+	JobID *string `json:"jobID,omitempty"`
+	Type  *string `json:"type_,omitempty"`
+}
+
+// The type and amount of a resource to assign to a container. The supported
+// resources include GPU, MEMORY, and VCPU.
+type BatchResourceRequirement struct {
+	Type  *string `json:"type_,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The retry strategy that's associated with a job. For more information, see
+// Automated job retries (https://docs.aws.amazon.com/batch/latest/userguide/job_retries.html)
+// in the Batch User Guide.
+type BatchRetryStrategy struct {
+	Attempts *int64 `json:"attempts,omitempty"`
+}
+
+// The details of a capacity provider strategy. To learn more, see CapacityProviderStrategyItem
+// (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CapacityProviderStrategyItem.html)
+// in the Amazon ECS API Reference.
+type CapacityProviderStrategyItem struct {
+	Base             *int64  `json:"base,omitempty"`
+	CapacityProvider *string `json:"capacityProvider,omitempty"`
+	Weight           *int64  `json:"weight,omitempty"`
+}
+
+// A DeadLetterConfig object that contains information about a dead-letter queue
+// configuration.
+type DeadLetterConfig struct {
+	ARN *string `json:"arn,omitempty"`
+}
+
+// The overrides that are sent to a container. An empty container override can
+// be passed in. An example of an empty container override is {"containerOverrides":
+// [ ] }. If a non-empty container override is specified, the name parameter
+// must be included.
+type ECSContainerOverride struct {
+	Command              []*string                 `json:"command,omitempty"`
+	CPU                  *int64                    `json:"cpu,omitempty"`
+	Environment          []*ECSEnvironmentVariable `json:"environment,omitempty"`
+	EnvironmentFiles     []*ECSEnvironmentFile     `json:"environmentFiles,omitempty"`
+	Memory               *int64                    `json:"memory,omitempty"`
+	MemoryReservation    *int64                    `json:"memoryReservation,omitempty"`
+	Name                 *string                   `json:"name,omitempty"`
+	ResourceRequirements []*ECSResourceRequirement `json:"resourceRequirements,omitempty"`
+}
+
+// A list of files containing the environment variables to pass to a container.
+// You can specify up to ten environment files. The file must have a .env file
+// extension. Each line in an environment file should contain an environment
+// variable in VARIABLE=VALUE format. Lines beginning with # are treated as
+// comments and are ignored. For more information about the environment variable
+// file syntax, see Declare default environment variables in file (https://docs.docker.com/compose/env-file/).
+//
+// If there are environment variables specified using the environment parameter
+// in a container definition, they take precedence over the variables contained
+// within an environment file. If multiple environment files are specified that
+// contain the same variable, they're processed from the top down. We recommend
+// that you use unique variable names. For more information, see Specifying
+// environment variables (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// This parameter is only supported for tasks hosted on Fargate using the following
+// platform versions:
+//
+//   - Linux platform version 1.4.0 or later.
+//
+//   - Windows platform version 1.0.0 or later.
+type ECSEnvironmentFile struct {
+	Type  *string `json:"type_,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The environment variables to send to the container. You can add new environment
+// variables, which are added to the container at launch, or you can override
+// the existing environment variables from the Docker image or the task definition.
+// You must also specify a container name.
+type ECSEnvironmentVariable struct {
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The amount of ephemeral storage to allocate for the task. This parameter
+// is used to expand the total amount of ephemeral storage available, beyond
+// the default amount, for tasks hosted on Fargate. For more information, see
+// Fargate task storage (https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html)
+// in the Amazon ECS User Guide for Fargate.
+//
+// This parameter is only supported for tasks hosted on Fargate using Linux
+// platform version 1.4.0 or later. This parameter is not supported for Windows
+// containers on Fargate.
+type ECSEphemeralStorage struct {
+	SizeInGiB *int64 `json:"sizeInGiB,omitempty"`
+}
+
+// Details on an Elastic Inference accelerator task override. This parameter
+// is used to override the Elastic Inference accelerator specified in the task
+// definition. For more information, see Working with Amazon Elastic Inference
+// on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-inference.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type ECSInferenceAcceleratorOverride struct {
+	DeviceName *string `json:"deviceName,omitempty"`
+	DeviceType *string `json:"deviceType,omitempty"`
+}
+
+// The type and amount of a resource to assign to a container. The supported
+// resource types are GPUs and Elastic Inference accelerators. For more information,
+// see Working with GPUs on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html)
+// or Working with Amazon Elastic Inference on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-inference.html)
+// in the Amazon Elastic Container Service Developer Guide
+type ECSResourceRequirement struct {
+	Type  *string `json:"type_,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The overrides that are associated with a task.
+type ECSTaskOverride struct {
+	ContainerOverrides []*ECSContainerOverride `json:"containerOverrides,omitempty"`
+	CPU                *string                 `json:"cpu,omitempty"`
+	// The amount of ephemeral storage to allocate for the task. This parameter
+	// is used to expand the total amount of ephemeral storage available, beyond
+	// the default amount, for tasks hosted on Fargate. For more information, see
+	// Fargate task storage (https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html)
+	// in the Amazon ECS User Guide for Fargate.
+	//
+	// This parameter is only supported for tasks hosted on Fargate using Linux
+	// platform version 1.4.0 or later. This parameter is not supported for Windows
+	// containers on Fargate.
+	EphemeralStorage              *ECSEphemeralStorage               `json:"ephemeralStorage,omitempty"`
+	ExecutionRoleARN              *string                            `json:"executionRoleARN,omitempty"`
+	InferenceAcceleratorOverrides []*ECSInferenceAcceleratorOverride `json:"inferenceAcceleratorOverrides,omitempty"`
+	Memory                        *string                            `json:"memory,omitempty"`
+	TaskRoleARN                   *string                            `json:"taskRoleARN,omitempty"`
+}
+
+// Filter events using an event pattern. For more information, see Events and
+// Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+// in the Amazon EventBridge User Guide.
+type Filter struct {
+	Pattern *string `json:"pattern,omitempty"`
+}
+
+// The collection of event patterns used to filter events. For more information,
+// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+// in the Amazon EventBridge User Guide.
+type FilterCriteria struct {
+	Filters []*Filter `json:"filters,omitempty"`
+}
+
+// The Secrets Manager secret that stores your broker credentials.
+type MQBrokerAccessCredentials struct {
+	// // Optional SecretManager ARN which stores the database credentials
+	BasicAuth *string `json:"basicAuth,omitempty"`
+}
+
+// The Secrets Manager secret that stores your stream credentials.
+type MSKAccessCredentials struct {
+	// // Optional SecretManager ARN which stores the database credentials
+	ClientCertificateTLSAuth *string `json:"clientCertificateTLSAuth,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	SASLSCRAM512Auth *string `json:"saslSCRAM512Auth,omitempty"`
+}
+
+// This structure specifies the network configuration for an Amazon ECS task.
+type NetworkConfiguration struct {
+	// This structure specifies the VPC subnets and security groups for the task,
+	// and whether a public IP address is to be used. This structure is relevant
+	// only for ECS tasks that use the awsvpc network mode.
+	AWSVPCConfiguration *AWSVPCConfiguration `json:"awsVPCConfiguration,omitempty"`
+}
+
+// These are custom parameter to be used when the target is an API Gateway REST
+// APIs or EventBridge ApiDestinations. In the latter case, these are merged
+// with any InvocationParameters specified on the Connection, with any values
+// from the Connection taking precedence.
+type PipeEnrichmentHTTPParameters struct {
+	HeaderParameters      map[string]*string `json:"headerParameters,omitempty"`
+	PathParameterValues   []*string          `json:"pathParameterValues,omitempty"`
+	QueryStringParameters map[string]*string `json:"queryStringParameters,omitempty"`
+}
+
+// The parameters required to set up enrichment on your pipe.
+type PipeEnrichmentParameters struct {
+	// These are custom parameter to be used when the target is an API Gateway REST
+	// APIs or EventBridge ApiDestinations. In the latter case, these are merged
+	// with any InvocationParameters specified on the Connection, with any values
+	// from the Connection taking precedence.
+	HTTPParameters *PipeEnrichmentHTTPParameters `json:"httpParameters,omitempty"`
+	InputTemplate  *string                       `json:"inputTemplate,omitempty"`
+}
+
+// The parameters for using an Active MQ broker as a source.
+type PipeSourceActiveMQBrokerParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your broker credentials.
+	Credentials                    *MQBrokerAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                     `json:"maximumBatchingWindowInSeconds,omitempty"`
+	QueueName                      *string                    `json:"queueName,omitempty"`
+}
+
+// The parameters for using a DynamoDB stream as a source.
+type PipeSourceDynamoDBStreamParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// A DeadLetterConfig object that contains information about a dead-letter queue
+	// configuration.
+	DeadLetterConfig               *DeadLetterConfig `json:"deadLetterConfig,omitempty"`
+	MaximumBatchingWindowInSeconds *int64            `json:"maximumBatchingWindowInSeconds,omitempty"`
+	MaximumRecordAgeInSeconds      *int64            `json:"maximumRecordAgeInSeconds,omitempty"`
+	MaximumRetryAttempts           *int64            `json:"maximumRetryAttempts,omitempty"`
+	OnPartialBatchItemFailure      *string           `json:"onPartialBatchItemFailure,omitempty"`
+	ParallelizationFactor          *int64            `json:"parallelizationFactor,omitempty"`
+	StartingPosition               *string           `json:"startingPosition,omitempty"`
+}
+
+// The parameters for using a Kinesis stream as a source.
+type PipeSourceKinesisStreamParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// A DeadLetterConfig object that contains information about a dead-letter queue
+	// configuration.
+	DeadLetterConfig               *DeadLetterConfig `json:"deadLetterConfig,omitempty"`
+	MaximumBatchingWindowInSeconds *int64            `json:"maximumBatchingWindowInSeconds,omitempty"`
+	MaximumRecordAgeInSeconds      *int64            `json:"maximumRecordAgeInSeconds,omitempty"`
+	MaximumRetryAttempts           *int64            `json:"maximumRetryAttempts,omitempty"`
+	OnPartialBatchItemFailure      *string           `json:"onPartialBatchItemFailure,omitempty"`
+	ParallelizationFactor          *int64            `json:"parallelizationFactor,omitempty"`
+	StartingPosition               *string           `json:"startingPosition,omitempty"`
+	StartingPositionTimestamp      *metav1.Time      `json:"startingPositionTimestamp,omitempty"`
+}
+
+// The parameters for using an MSK stream as a source.
+type PipeSourceManagedStreamingKafkaParameters struct {
+	BatchSize       *int64  `json:"batchSize,omitempty"`
+	ConsumerGroupID *string `json:"consumerGroupID,omitempty"`
+	// The Secrets Manager secret that stores your stream credentials.
+	Credentials                    *MSKAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                `json:"maximumBatchingWindowInSeconds,omitempty"`
+	StartingPosition               *string               `json:"startingPosition,omitempty"`
+	TopicName                      *string               `json:"topicName,omitempty"`
+}
+
+// The parameters required to set up a source for your pipe.
+type PipeSourceParameters struct {
+	// The parameters for using an Active MQ broker as a source.
+	ActiveMQBrokerParameters *PipeSourceActiveMQBrokerParameters `json:"activeMQBrokerParameters,omitempty"`
+	// The parameters for using a DynamoDB stream as a source.
+	DynamoDBStreamParameters *PipeSourceDynamoDBStreamParameters `json:"dynamoDBStreamParameters,omitempty"`
+	// The collection of event patterns used to filter events. For more information,
+	// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+	// in the Amazon EventBridge User Guide.
+	FilterCriteria *FilterCriteria `json:"filterCriteria,omitempty"`
+	// The parameters for using a Kinesis stream as a source.
+	KinesisStreamParameters *PipeSourceKinesisStreamParameters `json:"kinesisStreamParameters,omitempty"`
+	// The parameters for using an MSK stream as a source.
+	ManagedStreamingKafkaParameters *PipeSourceManagedStreamingKafkaParameters `json:"managedStreamingKafkaParameters,omitempty"`
+	// The parameters for using a Rabbit MQ broker as a source.
+	RabbitMQBrokerParameters *PipeSourceRabbitMQBrokerParameters `json:"rabbitMQBrokerParameters,omitempty"`
+	// The parameters for using a self-managed Apache Kafka stream as a source.
+	SelfManagedKafkaParameters *PipeSourceSelfManagedKafkaParameters `json:"selfManagedKafkaParameters,omitempty"`
+	// The parameters for using a Amazon SQS stream as a source.
+	SQSQueueParameters *PipeSourceSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
+}
+
+// The parameters for using a Rabbit MQ broker as a source.
+type PipeSourceRabbitMQBrokerParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your broker credentials.
+	Credentials                    *MQBrokerAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                     `json:"maximumBatchingWindowInSeconds,omitempty"`
+	QueueName                      *string                    `json:"queueName,omitempty"`
+	VirtualHost                    *string                    `json:"virtualHost,omitempty"`
+}
+
+// The parameters for using a Amazon SQS stream as a source.
+type PipeSourceSQSQueueParameters struct {
+	BatchSize                      *int64 `json:"batchSize,omitempty"`
+	MaximumBatchingWindowInSeconds *int64 `json:"maximumBatchingWindowInSeconds,omitempty"`
+}
+
+// The parameters for using a self-managed Apache Kafka stream as a source.
+type PipeSourceSelfManagedKafkaParameters struct {
+	AdditionalBootstrapServers []*string `json:"additionalBootstrapServers,omitempty"`
+	BatchSize                  *int64    `json:"batchSize,omitempty"`
+	ConsumerGroupID            *string   `json:"consumerGroupID,omitempty"`
+	// The Secrets Manager secret that stores your stream credentials.
+	Credentials                    *SelfManagedKafkaAccessConfigurationCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                                          `json:"maximumBatchingWindowInSeconds,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	ServerRootCaCertificate *string `json:"serverRootCaCertificate,omitempty"`
+	StartingPosition        *string `json:"startingPosition,omitempty"`
+	TopicName               *string `json:"topicName,omitempty"`
+	// This structure specifies the VPC subnets and security groups for the stream,
+	// and whether a public IP address is to be used.
+	VPC *SelfManagedKafkaAccessConfigurationVPC `json:"vpc,omitempty"`
+}
+
+// The parameters for using an Batch job as a target.
+type PipeTargetBatchJobParameters struct {
+	// The array properties for the submitted job, such as the size of the array.
+	// The array size can be between 2 and 10,000. If you specify array properties
+	// for a job, it becomes an array job. This parameter is used only if the target
+	// is an Batch job.
+	ArrayProperties *BatchArrayProperties `json:"arrayProperties,omitempty"`
+	// The overrides that are sent to a container.
+	ContainerOverrides *BatchContainerOverrides `json:"containerOverrides,omitempty"`
+	DependsOn          []*BatchJobDependency    `json:"dependsOn,omitempty"`
+	JobDefinition      *string                  `json:"jobDefinition,omitempty"`
+	JobName            *string                  `json:"jobName,omitempty"`
+	Parameters         map[string]*string       `json:"parameters,omitempty"`
+	// The retry strategy that's associated with a job. For more information, see
+	// Automated job retries (https://docs.aws.amazon.com/batch/latest/userguide/job_retries.html)
+	// in the Batch User Guide.
+	RetryStrategy *BatchRetryStrategy `json:"retryStrategy,omitempty"`
+}
+
+// The parameters for using an CloudWatch Logs log stream as a target.
+type PipeTargetCloudWatchLogsParameters struct {
+	LogStreamName *string `json:"logStreamName,omitempty"`
+	Timestamp     *string `json:"timestamp,omitempty"`
+}
+
+// The parameters for using an Amazon ECS task as a target.
+type PipeTargetECSTaskParameters struct {
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `json:"capacityProviderStrategy,omitempty"`
+	EnableECSManagedTags     *bool                           `json:"enableECSManagedTags,omitempty"`
+	EnableExecuteCommand     *bool                           `json:"enableExecuteCommand,omitempty"`
+	Group                    *string                         `json:"group,omitempty"`
+	LaunchType               *string                         `json:"launchType,omitempty"`
+	// This structure specifies the network configuration for an Amazon ECS task.
+	NetworkConfiguration *NetworkConfiguration `json:"networkConfiguration,omitempty"`
+	// The overrides that are associated with a task.
+	Overrides            *ECSTaskOverride       `json:"overrides,omitempty"`
+	PlacementConstraints []*PlacementConstraint `json:"placementConstraints,omitempty"`
+	PlacementStrategy    []*PlacementStrategy   `json:"placementStrategy,omitempty"`
+	PlatformVersion      *string                `json:"platformVersion,omitempty"`
+	PropagateTags        *string                `json:"propagateTags,omitempty"`
+	ReferenceID          *string                `json:"referenceID,omitempty"`
+	Tags                 []*Tag                 `json:"tags,omitempty"`
+	TaskCount            *int64                 `json:"taskCount,omitempty"`
+	TaskDefinitionARN    *string                `json:"taskDefinitionARN,omitempty"`
+}
+
+// The parameters for using an EventBridge event bus as a target.
+type PipeTargetEventBridgeEventBusParameters struct {
+	DetailType *string   `json:"detailType,omitempty"`
+	EndpointID *string   `json:"endpointID,omitempty"`
+	Resources  []*string `json:"resources,omitempty"`
+	Source     *string   `json:"source,omitempty"`
+	Time       *string   `json:"time,omitempty"`
+}
+
+// These are custom parameter to be used when the target is an API Gateway REST
+// APIs or EventBridge ApiDestinations.
+type PipeTargetHTTPParameters struct {
+	HeaderParameters      map[string]*string `json:"headerParameters,omitempty"`
+	PathParameterValues   []*string          `json:"pathParameterValues,omitempty"`
+	QueryStringParameters map[string]*string `json:"queryStringParameters,omitempty"`
+}
+
+// The parameters for using a Kinesis stream as a source.
+type PipeTargetKinesisStreamParameters struct {
+	PartitionKey *string `json:"partitionKey,omitempty"`
+}
+
+// The parameters for using a Lambda function as a target.
+type PipeTargetLambdaFunctionParameters struct {
+	InvocationType *string `json:"invocationType,omitempty"`
+}
+
+// The parameters required to set up a target for your pipe.
+type PipeTargetParameters struct {
+	// The parameters for using an Batch job as a target.
+	BatchJobParameters *PipeTargetBatchJobParameters `json:"batchJobParameters,omitempty"`
+	// The parameters for using an CloudWatch Logs log stream as a target.
+	CloudWatchLogsParameters *PipeTargetCloudWatchLogsParameters `json:"cloudWatchLogsParameters,omitempty"`
+	// The parameters for using an Amazon ECS task as a target.
+	ECSTaskParameters *PipeTargetECSTaskParameters `json:"ecsTaskParameters,omitempty"`
+	// The parameters for using an EventBridge event bus as a target.
+	EventBridgeEventBusParameters *PipeTargetEventBridgeEventBusParameters `json:"eventBridgeEventBusParameters,omitempty"`
+	// These are custom parameter to be used when the target is an API Gateway REST
+	// APIs or EventBridge ApiDestinations.
+	HTTPParameters *PipeTargetHTTPParameters `json:"httpParameters,omitempty"`
+	InputTemplate  *string                   `json:"inputTemplate,omitempty"`
+	// The parameters for using a Kinesis stream as a source.
+	KinesisStreamParameters *PipeTargetKinesisStreamParameters `json:"kinesisStreamParameters,omitempty"`
+	// The parameters for using a Lambda function as a target.
+	LambdaFunctionParameters *PipeTargetLambdaFunctionParameters `json:"lambdaFunctionParameters,omitempty"`
+	// These are custom parameters to be used when the target is a Amazon Redshift
+	// cluster to invoke the Amazon Redshift Data API ExecuteStatement.
+	RedshiftDataParameters *PipeTargetRedshiftDataParameters `json:"redshiftDataParameters,omitempty"`
+	// The parameters for using a SageMaker pipeline as a target.
+	SageMakerPipelineParameters *PipeTargetSageMakerPipelineParameters `json:"sageMakerPipelineParameters,omitempty"`
+	// The parameters for using a Amazon SQS stream as a source.
+	SQSQueueParameters *PipeTargetSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
+	// The parameters for using a Step Functions state machine as a target.
+	StepFunctionStateMachineParameters *PipeTargetStateMachineParameters `json:"stepFunctionStateMachineParameters,omitempty"`
+}
+
+// These are custom parameters to be used when the target is a Amazon Redshift
+// cluster to invoke the Amazon Redshift Data API ExecuteStatement.
+type PipeTargetRedshiftDataParameters struct {
+	// // Redshift Database
+	Database *string `json:"database,omitempty"`
+	// // Database user name
+	DBUser *string `json:"dbUser,omitempty"`
+	// // For targets, can either specify an ARN or a jsonpath pointing to the ARN.
+	SecretManagerARN *string `json:"secretManagerARN,omitempty"`
+	// // A list of SQLs.
+	SQLs []*string `json:"sqls,omitempty"`
+	// // A name for Redshift DataAPI statement which can be used as filter of //
+	// ListStatement.
+	StatementName *string `json:"statementName,omitempty"`
+	WithEvent     *bool   `json:"withEvent,omitempty"`
+}
+
+// The parameters for using a Amazon SQS stream as a source.
+type PipeTargetSQSQueueParameters struct {
+	MessageDeduplicationID *string `json:"messageDeduplicationID,omitempty"`
+	MessageGroupID         *string `json:"messageGroupID,omitempty"`
+}
+
+// The parameters for using a SageMaker pipeline as a target.
+type PipeTargetSageMakerPipelineParameters struct {
+	PipelineParameterList []*SageMakerPipelineParameter `json:"pipelineParameterList,omitempty"`
+}
+
+// The parameters for using a Step Functions state machine as a target.
+type PipeTargetStateMachineParameters struct {
+	InvocationType *string `json:"invocationType,omitempty"`
+}
+
+// An object that represents a pipe. Amazon EventBridgePipes connect event sources
+// to targets and reduces the need for specialized knowledge and integration
+// code.
+type Pipe_SDK struct {
+	ARN              *string      `json:"arn,omitempty"`
+	CreationTime     *metav1.Time `json:"creationTime,omitempty"`
+	CurrentState     *string      `json:"currentState,omitempty"`
+	DesiredState     *string      `json:"desiredState,omitempty"`
+	Enrichment       *string      `json:"enrichment,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name             *string      `json:"name,omitempty"`
+	Source           *string      `json:"source,omitempty"`
+	StateReason      *string      `json:"stateReason,omitempty"`
+	Target           *string      `json:"target,omitempty"`
+}
+
+// An object representing a constraint on task placement. To learn more, see
+// Task Placement Constraints (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type PlacementConstraint struct {
+	Expression *string `json:"expression,omitempty"`
+	Type       *string `json:"type_,omitempty"`
+}
+
+// The task placement strategy for a task or service. To learn more, see Task
+// Placement Strategies (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
+// in the Amazon Elastic Container Service Service Developer Guide.
+type PlacementStrategy struct {
+	Field *string `json:"field,omitempty"`
+	Type  *string `json:"type_,omitempty"`
+}
+
+// Name/Value pair of a parameter to start execution of a SageMaker Model Building
+// Pipeline.
+type SageMakerPipelineParameter struct {
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The Secrets Manager secret that stores your stream credentials.
+type SelfManagedKafkaAccessConfigurationCredentials struct {
+	// // Optional SecretManager ARN which stores the database credentials
+	BasicAuth *string `json:"basicAuth,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	ClientCertificateTLSAuth *string `json:"clientCertificateTLSAuth,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	SASLSCRAM256Auth *string `json:"saslSCRAM256Auth,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	SASLSCRAM512Auth *string `json:"saslSCRAM512Auth,omitempty"`
+}
+
+// This structure specifies the VPC subnets and security groups for the stream,
+// and whether a public IP address is to be used.
+type SelfManagedKafkaAccessConfigurationVPC struct {
+	// List of SecurityGroupId.
+	SecurityGroup []*string `json:"securityGroup,omitempty"`
+	// List of SubnetId.
+	Subnets []*string `json:"subnets,omitempty"`
+}
+
+// A key-value pair associated with an Amazon Web Services resource. In EventBridge,
+// rules and event buses support tagging.
+type Tag struct {
+	Key   *string `json:"key,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// The parameters for using an Active MQ broker as a source.
+type UpdatePipeSourceActiveMQBrokerParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your broker credentials.
+	Credentials                    *MQBrokerAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                     `json:"maximumBatchingWindowInSeconds,omitempty"`
+}
+
+// The parameters for using a DynamoDB stream as a source.
+type UpdatePipeSourceDynamoDBStreamParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// A DeadLetterConfig object that contains information about a dead-letter queue
+	// configuration.
+	DeadLetterConfig               *DeadLetterConfig `json:"deadLetterConfig,omitempty"`
+	MaximumBatchingWindowInSeconds *int64            `json:"maximumBatchingWindowInSeconds,omitempty"`
+	MaximumRecordAgeInSeconds      *int64            `json:"maximumRecordAgeInSeconds,omitempty"`
+	MaximumRetryAttempts           *int64            `json:"maximumRetryAttempts,omitempty"`
+	OnPartialBatchItemFailure      *string           `json:"onPartialBatchItemFailure,omitempty"`
+	ParallelizationFactor          *int64            `json:"parallelizationFactor,omitempty"`
+}
+
+// The parameters for using a Kinesis stream as a source.
+type UpdatePipeSourceKinesisStreamParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// A DeadLetterConfig object that contains information about a dead-letter queue
+	// configuration.
+	DeadLetterConfig               *DeadLetterConfig `json:"deadLetterConfig,omitempty"`
+	MaximumBatchingWindowInSeconds *int64            `json:"maximumBatchingWindowInSeconds,omitempty"`
+	MaximumRecordAgeInSeconds      *int64            `json:"maximumRecordAgeInSeconds,omitempty"`
+	MaximumRetryAttempts           *int64            `json:"maximumRetryAttempts,omitempty"`
+	OnPartialBatchItemFailure      *string           `json:"onPartialBatchItemFailure,omitempty"`
+	ParallelizationFactor          *int64            `json:"parallelizationFactor,omitempty"`
+}
+
+// The parameters for using an MSK stream as a source.
+type UpdatePipeSourceManagedStreamingKafkaParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your stream credentials.
+	Credentials                    *MSKAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                `json:"maximumBatchingWindowInSeconds,omitempty"`
+}
+
+// The parameters required to set up a source for your pipe.
+type UpdatePipeSourceParameters struct {
+	// The parameters for using an Active MQ broker as a source.
+	ActiveMQBrokerParameters *UpdatePipeSourceActiveMQBrokerParameters `json:"activeMQBrokerParameters,omitempty"`
+	// The parameters for using a DynamoDB stream as a source.
+	DynamoDBStreamParameters *UpdatePipeSourceDynamoDBStreamParameters `json:"dynamoDBStreamParameters,omitempty"`
+	// The collection of event patterns used to filter events. For more information,
+	// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+	// in the Amazon EventBridge User Guide.
+	FilterCriteria *FilterCriteria `json:"filterCriteria,omitempty"`
+	// The parameters for using a Kinesis stream as a source.
+	KinesisStreamParameters *UpdatePipeSourceKinesisStreamParameters `json:"kinesisStreamParameters,omitempty"`
+	// The parameters for using an MSK stream as a source.
+	ManagedStreamingKafkaParameters *UpdatePipeSourceManagedStreamingKafkaParameters `json:"managedStreamingKafkaParameters,omitempty"`
+	// The parameters for using a Rabbit MQ broker as a source.
+	RabbitMQBrokerParameters *UpdatePipeSourceRabbitMQBrokerParameters `json:"rabbitMQBrokerParameters,omitempty"`
+	// The parameters for using a self-managed Apache Kafka stream as a source.
+	SelfManagedKafkaParameters *UpdatePipeSourceSelfManagedKafkaParameters `json:"selfManagedKafkaParameters,omitempty"`
+	// The parameters for using a Amazon SQS stream as a source.
+	SQSQueueParameters *UpdatePipeSourceSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
+}
+
+// The parameters for using a Rabbit MQ broker as a source.
+type UpdatePipeSourceRabbitMQBrokerParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your broker credentials.
+	Credentials                    *MQBrokerAccessCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                     `json:"maximumBatchingWindowInSeconds,omitempty"`
+}
+
+// The parameters for using a Amazon SQS stream as a source.
+type UpdatePipeSourceSQSQueueParameters struct {
+	BatchSize                      *int64 `json:"batchSize,omitempty"`
+	MaximumBatchingWindowInSeconds *int64 `json:"maximumBatchingWindowInSeconds,omitempty"`
+}
+
+// The parameters for using a self-managed Apache Kafka stream as a source.
+type UpdatePipeSourceSelfManagedKafkaParameters struct {
+	BatchSize *int64 `json:"batchSize,omitempty"`
+	// The Secrets Manager secret that stores your stream credentials.
+	Credentials                    *SelfManagedKafkaAccessConfigurationCredentials `json:"credentials,omitempty"`
+	MaximumBatchingWindowInSeconds *int64                                          `json:"maximumBatchingWindowInSeconds,omitempty"`
+	// // Optional SecretManager ARN which stores the database credentials
+	ServerRootCaCertificate *string `json:"serverRootCaCertificate,omitempty"`
+	// This structure specifies the VPC subnets and security groups for the stream,
+	// and whether a public IP address is to be used.
+	VPC *SelfManagedKafkaAccessConfigurationVPC `json:"vpc,omitempty"`
+}
+
+// Indicates that an error has occurred while performing a validate operation.
+type ValidationExceptionField struct {
+	Name *string `json:"name,omitempty"`
+}
