@@ -9,3 +9,15 @@ if pipeInMutatingState(latest) {
 if !delta.DifferentExcept("Spec.CurrentState") {
 	return latest, requeueWaitWhileUpdating
 }
+
+if delta.DifferentAt("Spec.Tags") {
+	err = rm.updatePipeTags(ctx, latest, desired)
+	if err != nil {
+		return nil, err
+	}
+}
+
+// If no other differences were observe, avoid making UpdatePipe API calls.
+if !delta.DifferentExcept("Spec.Tags") {
+	return desired, nil
+}

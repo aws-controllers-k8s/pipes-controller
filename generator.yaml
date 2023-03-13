@@ -57,9 +57,5 @@ resources:
           json_path: .status.currentState
           type: string
     exceptions:
-      errors:
-        404:
-          code: ""
-          message_suffix: "does not exist."
       terminal_codes:
         - ValidationException

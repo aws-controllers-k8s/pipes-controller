@@ -80,7 +80,7 @@ func (rm *resourceManager) sdkFind(
 		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
 			return nil, ackerr.NotFound
 		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "" && strings.HasSuffix(awsErr.Message(), "does not exist.") {
+		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NotFoundException" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -1819,6 +1819,17 @@ func (rm *resourceManager) sdkUpdate(
 		return latest, requeueWaitWhileUpdating
 	}
 
+	if delta.DifferentAt("Spec.Tags") {
+		err = rm.updatePipeTags(ctx, latest, desired)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// If no other differences were observe, avoid making UpdatePipe API calls.
+	if !delta.DifferentExcept("Spec.Tags") {
+		return desired, nil
+	}
 	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
 	if err != nil {
 		return nil, err
