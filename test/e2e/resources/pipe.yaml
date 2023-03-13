@@ -1,0 +1,15 @@
+apiVersion: pipes.services.k8s.aws/v1alpha1
+kind: Pipe
+metadata:
+  name: $PIPE_NAME
+spec:
+  name: $PIPE_NAME
+  description: testing pipe created ACK
+  roleARN: $PIPE_ROLE_ARN
+  source: $SOURCE_ARN
+  target: $TARGET_ARN
+  sourceParameters:
+    sqsQueueParameters:
+      batchSize: 10
+  tags:
+    env: testing

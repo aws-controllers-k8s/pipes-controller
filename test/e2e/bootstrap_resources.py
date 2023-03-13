@@ -17,11 +17,16 @@ for them.
 
 from dataclasses import dataclass
 from acktest.bootstrapping import Resources
+from acktest.bootstrapping.iam import Role
+from acktest.bootstrapping.sqs import Queue
+
 from e2e import bootstrap_directory
 
 @dataclass
 class BootstrapResources(Resources):
-    pass
+    PipeRole: Role
+    SourceQueue: Queue
+    TargetQueue: Queue
 
 _bootstrap_resources = None
 
