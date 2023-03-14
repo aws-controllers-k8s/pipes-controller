@@ -34,6 +34,8 @@ import (
 	svctypes "github.com/aws-controllers-k8s/pipes-controller/apis/v1alpha1"
 	svcresource "github.com/aws-controllers-k8s/pipes-controller/pkg/resource"
 
+	_ "github.com/aws-controllers-k8s/pipes-controller/pkg/resource/pipe"
+
 	"github.com/aws-controllers-k8s/pipes-controller/pkg/version"
 )
 

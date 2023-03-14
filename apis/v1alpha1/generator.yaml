@@ -1,5 +1,61 @@
 ignore:
   resource_names:
-  - Pipe
+      # - Pipe
 sdk_names:
-  model: pipes
+  client_struct: Pipes
+  client_interface: PipesAPI
+resources:
+  Pipe:
+    fields:
+      DesiredState:
+        compare:
+          is_ignored: true
+      SourceParameters:
+        compare:
+          is_ignored: true
+      TargetParameters:
+        compare:
+          is_ignored: true
+      EnrichmentParameters:
+        compare:
+          is_ignored: true
+      StateReason:
+        is_read_only: true
+        from:
+          operation: DescribePipe
+          path: StateReason
+    hooks:
+      delta_pre_compare:
+        code: customPreCompare(delta, a, b)
+      sdk_create_post_set_output:
+        template_path: hooks/pipe/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/pipe/sdk_update_pre_build_request.go.tpl
+      sdk_update_pre_set_output:
+        template_path: hooks/pipe/sdk_update_pre_set_output.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/pipe/sdk_update_post_build_request.go.tpl
+      sdk_delete_post_request:
+        template_path: hooks/pipe/sdk_delete_post_request.go.tpl
+    print:
+      add_age_column: true
+      add_synced_column: true
+      additional_columns:
+        - name: ARN
+          json_path: .status.ackResourceMetadata.arn
+          type: string
+          priority: 1
+        - name: SOURCE
+          json_path: .spec.source
+          type: string
+          priority: 1
+        - name: TARGET
+          json_path: .spec.target
+          type: string
+          priority: 1
+        - name: STATE
+          json_path: .status.currentState
+          type: string
+    exceptions:
+      terminal_codes:
+        - ValidationException
