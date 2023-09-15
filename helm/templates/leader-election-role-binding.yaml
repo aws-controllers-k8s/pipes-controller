@@ -14,5 +14,5 @@ roleRef:
   name: pipes-leader-election-role
 subjects:
 - kind: ServiceAccount
-  name: ack-pipes-controller
+  name: {{ include "service-account.name" . }}
   namespace: {{ .Release.Namespace }}{{- end }}
