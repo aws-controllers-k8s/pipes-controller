@@ -3,17 +3,20 @@
 ---
 annotations:
   capabilityLevel: Basic Install
-  shortDescription: AWS Pipes controller is a service controller for managing Pipes resources
+  shortDescription: AWS EventBridge Pipes controller is a service controller for managing Pipes resources
     in Kubernetes
-displayName: AWS Controllers for Kubernetes - Amazon Pipes
+displayName: AWS Controllers for Kubernetes - Amazon EventBridge Pipes
 description: |-
-  Manage Amazon Pipes resources in AWS from within your Kubernetes cluster.
+  Manage Amazon EventBridge Pipes resources in AWS from within your Kubernetes cluster.
 
 
-  **About Amazon Pipes**
+  **About Amazon EventBridge Pipes**
 
 
-  {ADD YOUR DESCRIPTION HERE}
+  Amazon EventBridge Pipes connects sources to targets. Pipes are intended for point-to-point integrations between supported [sources](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html)
+  and [targets](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html), with support for advanced transformations and [enrichment](https://docs.aws.amazon.com/eventbridge/latest/userguide/pipes-enrichment.html). 
+  It reduces the need for specialized knowledge and integration code when developing event-driven architectures, fostering consistency across your company’s applications. To set up a pipe, you choose the source, 
+  add optional filtering, define optional enrichment, and choose the target for the event data.
 
 
   **About the AWS Controllers for Kubernetes**
@@ -28,13 +31,11 @@ description: |-
 
   Please follow the following link: [Red Hat OpenShift](https://aws-controllers-k8s.github.io/community/docs/user-docs/openshift/)
 samples:
-- kind: ExampleCustomKind
-  spec: '{}'
-- kind: SecondExampleCustomKind
+- kind: Pipe
   spec: '{}'
 maintainers:
 - name: "pipes maintainer team"
   email: "ack-maintainers@amazon.com"
 links:
-- name: Amazon Pipes Developer Resources
-  url: https://aws.amazon.com/Pipes/developer-resources/
+- name: Amazon EventBridge Pipes Developer Resources
+  url: https://aws.amazon.com/eventbridge/pipes/
