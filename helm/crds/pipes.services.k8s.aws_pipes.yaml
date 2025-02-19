@@ -67,13 +67,10 @@ spec:
               code.
             properties:
               description:
-                description: A description of the pipe.
                 type: string
               desiredState:
-                description: The state the pipe should be in.
                 type: string
               enrichment:
-                description: The ARN of the enrichment resource.
                 type: string
               enrichmentParameters:
                 description: The parameters required to set up enrichment on your
@@ -103,14 +100,10 @@ spec:
                     type: string
                 type: object
               name:
-                description: The name of the pipe.
                 type: string
               roleARN:
-                description: The ARN of the role that allows the pipe to send data
-                  to the target.
                 type: string
               source:
-                description: The ARN of the source resource.
                 type: string
               sourceParameters:
                 description: The parameters required to set up a source for your pipe.
@@ -361,10 +354,8 @@ spec:
               tags:
                 additionalProperties:
                   type: string
-                description: The list of key-value pairs to associate with the pipe.
                 type: object
               target:
-                description: The ARN of the target resource.
                 type: string
               targetParameters:
                 description: |-
@@ -844,7 +835,7 @@ spec:
                 type: object
               conditions:
                 description: |-
-                  All CRS managed by ACK have a common `Status.Conditions` member that
+                  All CRs managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
