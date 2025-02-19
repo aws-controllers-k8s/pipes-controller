@@ -28,34 +28,49 @@ import (
 type PipeSpec struct {
 
 	// A description of the pipe.
+
 	Description *string `json:"description,omitempty"`
 	// The state the pipe should be in.
+
 	DesiredState *string `json:"desiredState,omitempty"`
 	// The ARN of the enrichment resource.
+
 	Enrichment *string `json:"enrichment,omitempty"`
 	// The parameters required to set up enrichment on your pipe.
+
 	EnrichmentParameters *PipeEnrichmentParameters `json:"enrichmentParameters,omitempty"`
 	// The name of the pipe.
+
 	// +kubebuilder:validation:Required
+
 	Name *string `json:"name"`
 	// The ARN of the role that allows the pipe to send data to the target.
+
 	// +kubebuilder:validation:Required
+
 	RoleARN *string `json:"roleARN"`
 	// The ARN of the source resource.
+
 	// +kubebuilder:validation:Required
+
 	Source *string `json:"source"`
 	// The parameters required to set up a source for your pipe.
+
 	SourceParameters *PipeSourceParameters `json:"sourceParameters,omitempty"`
 	// The list of key-value pairs to associate with the pipe.
+
 	Tags map[string]*string `json:"tags,omitempty"`
 	// The ARN of the target resource.
+
 	// +kubebuilder:validation:Required
+
 	Target *string `json:"target"`
 	// The parameters required to set up a target for your pipe.
 	//
 	// For more information about pipe target parameters, including how to use dynamic
 	// path parameters, see Target parameters (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
 	// in the Amazon EventBridge User Guide.
+
 	TargetParameters *PipeTargetParameters `json:"targetParameters,omitempty"`
 }
 
@@ -66,7 +81,7 @@ type PipeStatus struct {
 	// constructed ARN for the resource
 	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
-	// All CRS managed by ACK have a common `Status.Conditions` member that
+	// All CRs managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource
