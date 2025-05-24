@@ -28,20 +28,30 @@ import (
 type PipeSpec struct {
 
 	// A description of the pipe.
+	//
+	// Regex Pattern: `^.*$`
 	Description *string `json:"description,omitempty"`
 	// The state the pipe should be in.
 	DesiredState *string `json:"desiredState,omitempty"`
 	// The ARN of the enrichment resource.
+	//
+	// Regex Pattern: `^$|arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-]+):([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?)?:(\d{12})?:(.+)$`
 	Enrichment *string `json:"enrichment,omitempty"`
 	// The parameters required to set up enrichment on your pipe.
 	EnrichmentParameters *PipeEnrichmentParameters `json:"enrichmentParameters,omitempty"`
 	// The name of the pipe.
+	//
+	// Regex Pattern: `^[\.\-_A-Za-z0-9]+$`
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The ARN of the role that allows the pipe to send data to the target.
+	//
+	// Regex Pattern: `^arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z0-9+=,.@\-_/]+$`
 	// +kubebuilder:validation:Required
 	RoleARN *string `json:"roleARN"`
 	// The ARN of the source resource.
+	//
+	// Regex Pattern: `^smk://(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]):[0-9]{1,5}|arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-]+):([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?)?:(\d{12})?:(.+)$`
 	// +kubebuilder:validation:Required
 	Source *string `json:"source"`
 	// The parameters required to set up a source for your pipe.
@@ -49,6 +59,8 @@ type PipeSpec struct {
 	// The list of key-value pairs to associate with the pipe.
 	Tags map[string]*string `json:"tags,omitempty"`
 	// The ARN of the target resource.
+	//
+	// Regex Pattern: `^arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-]+):([a-z]{2,4}((-gov)|(-de)|(-iso([a-z]?)))?-[a-z]+(-\d{1})?)?:(\d{12})?:(.+)$`
 	// +kubebuilder:validation:Required
 	Target *string `json:"target"`
 	// The parameters required to set up a target for your pipe.
@@ -83,6 +95,8 @@ type PipeStatus struct {
 	// +kubebuilder:validation:Optional
 	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
 	// The reason the pipe is in its current state.
+	//
+	// Regex Pattern: `^.*$`
 	// +kubebuilder:validation:Optional
 	StateReason *string `json:"stateReason,omitempty"`
 }
