@@ -1018,6 +1018,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f0f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
 					f7f0f1f0Parent.Value = *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth
+					f7f0f1 = f7f0f1f0Parent
+					isInterfaceSet = true
 				}
 				f7f0.Credentials = f7f0f1
 			}
@@ -1188,6 +1190,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f4f2f0Parent := &svcsdktypes.MSKAccessCredentialsMemberClientCertificateTlsAuth{}
 					f7f4f2f0Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f7f4f2 = f7f4f2f0Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
@@ -1195,6 +1199,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f4f2f1Parent := &svcsdktypes.MSKAccessCredentialsMemberSaslScram512Auth{}
 					f7f4f2f1Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth
+					f7f4f2 = f7f4f2f1Parent
+					isInterfaceSet = true
 				}
 				f7f4.Credentials = f7f4f2
 			}
@@ -1233,6 +1239,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f5f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
 					f7f5f1f0Parent.Value = *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials.BasicAuth
+					f7f5f1 = f7f5f1f0Parent
+					isInterfaceSet = true
 				}
 				f7f5.Credentials = f7f5f1
 			}
@@ -1277,6 +1285,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f6f3f0Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberBasicAuth{}
 					f7f6f3f0Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.BasicAuth
+					f7f6f3 = f7f6f3f0Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth != nil {
 					if isInterfaceSet {
@@ -1284,6 +1294,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f6f3f1Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberClientCertificateTlsAuth{}
 					f7f6f3f1Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f7f6f3 = f7f6f3f1Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth != nil {
 					if isInterfaceSet {
@@ -1291,6 +1303,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f6f3f2Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram256Auth{}
 					f7f6f3f2Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth
+					f7f6f3 = f7f6f3f2Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
@@ -1298,6 +1312,8 @@ func (rm *resourceManager) newCreateRequestPayload(
 					}
 					f7f6f3f3Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram512Auth{}
 					f7f6f3f3Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth
+					f7f6f3 = f7f6f3f3Parent
+					isInterfaceSet = true
 				}
 				f7f6.Credentials = f7f6f3
 			}
@@ -1977,6 +1993,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f0f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
 					f8f0f1f0Parent.Value = *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth
+					f8f0f1 = f8f0f1f0Parent
+					isInterfaceSet = true
 				}
 				f8f0.Credentials = f8f0f1
 			}
@@ -2132,6 +2150,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f4f1f0Parent := &svcsdktypes.MSKAccessCredentialsMemberClientCertificateTlsAuth{}
 					f8f4f1f0Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f8f4f1 = f8f4f1f0Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
@@ -2139,6 +2159,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f4f1f1Parent := &svcsdktypes.MSKAccessCredentialsMemberSaslScram512Auth{}
 					f8f4f1f1Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth
+					f8f4f1 = f8f4f1f1Parent
+					isInterfaceSet = true
 				}
 				f8f4.Credentials = f8f4f1
 			}
@@ -2171,6 +2193,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f5f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
 					f8f5f1f0Parent.Value = *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials.BasicAuth
+					f8f5f1 = f8f5f1f0Parent
+					isInterfaceSet = true
 				}
 				f8f5.Credentials = f8f5f1
 			}
@@ -2203,6 +2227,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f6f1f0Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberBasicAuth{}
 					f8f6f1f0Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.BasicAuth
+					f8f6f1 = f8f6f1f0Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth != nil {
 					if isInterfaceSet {
@@ -2210,6 +2236,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f6f1f1Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberClientCertificateTlsAuth{}
 					f8f6f1f1Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f8f6f1 = f8f6f1f1Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth != nil {
 					if isInterfaceSet {
@@ -2217,6 +2245,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f6f1f2Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram256Auth{}
 					f8f6f1f2Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth
+					f8f6f1 = f8f6f1f2Parent
+					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
@@ -2224,6 +2254,8 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					}
 					f8f6f1f3Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram512Auth{}
 					f8f6f1f3Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth
+					f8f6f1 = f8f6f1f3Parent
+					isInterfaceSet = true
 				}
 				f8f6.Credentials = f8f6f1
 			}
