@@ -32,9 +32,11 @@ var (
 // and whether a public IP address is to be used. This structure is relevant
 // only for ECS tasks that use the awsvpc network mode.
 type AWSVPCConfiguration struct {
-	AssignPublicIP *string   `json:"assignPublicIP,omitempty"`
-	SecurityGroups []*string `json:"securityGroups,omitempty"`
-	Subnets        []*string `json:"subnets,omitempty"`
+	AssignPublicIP *string `json:"assignPublicIP,omitempty"`
+	// Reference field for SecurityGroups
+	SecurityGroupRefs []*ackv1alpha1.AWSResourceReferenceWrapper `json:"securityGroupRefs,omitempty"`
+	SecurityGroups    []*string                                  `json:"securityGroups,omitempty"`
+	Subnets           []*string                                  `json:"subnets,omitempty"`
 }
 
 // The array properties for the submitted job, such as the size of the array.
@@ -205,11 +207,15 @@ type ECSTaskOverride struct {
 	// This parameter is only supported for tasks hosted on Fargate using Linux
 	// platform version 1.4.0 or later. This parameter is not supported for Windows
 	// containers on Fargate.
-	EphemeralStorage              *ECSEphemeralStorage               `json:"ephemeralStorage,omitempty"`
-	ExecutionRoleARN              *string                            `json:"executionRoleARN,omitempty"`
-	InferenceAcceleratorOverrides []*ECSInferenceAcceleratorOverride `json:"inferenceAcceleratorOverrides,omitempty"`
-	Memory                        *string                            `json:"memory,omitempty"`
-	TaskRoleARN                   *string                            `json:"taskRoleARN,omitempty"`
+	EphemeralStorage *ECSEphemeralStorage `json:"ephemeralStorage,omitempty"`
+	ExecutionRoleARN *string              `json:"executionRoleARN,omitempty"`
+	// Reference field for ExecutionRoleARN
+	ExecutionRoleRef              *ackv1alpha1.AWSResourceReferenceWrapper `json:"executionRoleRef,omitempty"`
+	InferenceAcceleratorOverrides []*ECSInferenceAcceleratorOverride       `json:"inferenceAcceleratorOverrides,omitempty"`
+	Memory                        *string                                  `json:"memory,omitempty"`
+	TaskRoleARN                   *string                                  `json:"taskRoleARN,omitempty"`
+	// Reference field for TaskRoleARN
+	TaskRoleRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"taskRoleRef,omitempty"`
 }
 
 // Filter events using an event pattern. For more information, see Events and
@@ -656,6 +662,8 @@ type SelfManagedKafkaAccessConfigurationCredentials struct {
 type SelfManagedKafkaAccessConfigurationVPC struct {
 	// List of SecurityGroupId.
 	SecurityGroup []*string `json:"securityGroup,omitempty"`
+	// Reference field for Subnets
+	SubnetRefs []*ackv1alpha1.AWSResourceReferenceWrapper `json:"subnetRefs,omitempty"`
 	// List of SubnetId.
 	Subnets []*string `json:"subnets,omitempty"`
 }

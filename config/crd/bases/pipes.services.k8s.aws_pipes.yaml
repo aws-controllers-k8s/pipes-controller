@@ -120,6 +120,23 @@ spec:
 
                   Regex Pattern: `^arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z0-9+=,.@\-_/]+$`
                 type: string
+              roleRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
               source:
                 description: |-
                   The ARN of the source resource.
@@ -353,6 +370,26 @@ spec:
                             items:
                               type: string
                             type: array
+                          subnetRefs:
+                            description: Reference field for Subnets
+                            items:
+                              description: "AWSResourceReferenceWrapper provides a
+                                wrapper around *AWSResourceReference\ntype to provide
+                                more user friendly syntax for references using 'from'
+                                field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t  name: my-api"
+                              properties:
+                                from:
+                                  description: |-
+                                    AWSResourceReference provides all the values necessary to reference another
+                                    k8s resource for finding the identifier(Id/ARN/Name)
+                                  properties:
+                                    name:
+                                      type: string
+                                    namespace:
+                                      type: string
+                                  type: object
+                              type: object
+                            type: array
                           subnets:
                             description: List of SubnetId.
                             items:
@@ -522,6 +559,27 @@ spec:
                             properties:
                               assignPublicIP:
                                 type: string
+                              securityGroupRefs:
+                                description: Reference field for SecurityGroups
+                                items:
+                                  description: "AWSResourceReferenceWrapper provides
+                                    a wrapper around *AWSResourceReference\ntype to
+                                    provide more user friendly syntax for references
+                                    using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                                    \ name: my-api"
+                                  properties:
+                                    from:
+                                      description: |-
+                                        AWSResourceReference provides all the values necessary to reference another
+                                        k8s resource for finding the identifier(Id/ARN/Name)
+                                      properties:
+                                        name:
+                                          type: string
+                                        namespace:
+                                          type: string
+                                      type: object
+                                  type: object
+                                type: array
                               securityGroups:
                                 items:
                                   type: string
@@ -640,6 +698,20 @@ spec:
                             type: object
                           executionRoleARN:
                             type: string
+                          executionRoleRef:
+                            description: Reference field for ExecutionRoleARN
+                            properties:
+                              from:
+                                description: |-
+                                  AWSResourceReference provides all the values necessary to reference another
+                                  k8s resource for finding the identifier(Id/ARN/Name)
+                                properties:
+                                  name:
+                                    type: string
+                                  namespace:
+                                    type: string
+                                type: object
+                            type: object
                           inferenceAcceleratorOverrides:
                             items:
                               description: |-
@@ -659,6 +731,20 @@ spec:
                             type: string
                           taskRoleARN:
                             type: string
+                          taskRoleRef:
+                            description: Reference field for TaskRoleARN
+                            properties:
+                              from:
+                                description: |-
+                                  AWSResourceReference provides all the values necessary to reference another
+                                  k8s resource for finding the identifier(Id/ARN/Name)
+                                properties:
+                                  name:
+                                    type: string
+                                  namespace:
+                                    type: string
+                                type: object
+                            type: object
                         type: object
                       placementConstraints:
                         items:
@@ -823,7 +909,6 @@ spec:
                 type: object
             required:
             - name
-            - roleARN
             - source
             - target
             type: object

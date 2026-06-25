@@ -32,6 +32,17 @@ func (in *AWSVPCConfiguration) DeepCopyInto(out *AWSVPCConfiguration) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.SecurityGroupRefs != nil {
+		in, out := &in.SecurityGroupRefs, &out.SecurityGroupRefs
+		*out = make([]*corev1alpha1.AWSResourceReferenceWrapper, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+				(*in).DeepCopyInto(*out)
+			}
+		}
+	}
 	if in.SecurityGroups != nil {
 		in, out := &in.SecurityGroups, &out.SecurityGroups
 		*out = make([]*string, len(*in))
@@ -552,6 +563,11 @@ func (in *ECSTaskOverride) DeepCopyInto(out *ECSTaskOverride) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ExecutionRoleRef != nil {
+		in, out := &in.ExecutionRoleRef, &out.ExecutionRoleRef
+		*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.InferenceAcceleratorOverrides != nil {
 		in, out := &in.InferenceAcceleratorOverrides, &out.InferenceAcceleratorOverrides
 		*out = make([]*ECSInferenceAcceleratorOverride, len(*in))
@@ -572,6 +588,11 @@ func (in *ECSTaskOverride) DeepCopyInto(out *ECSTaskOverride) {
 		in, out := &in.TaskRoleARN, &out.TaskRoleARN
 		*out = new(string)
 		**out = **in
+	}
+	if in.TaskRoleRef != nil {
+		in, out := &in.TaskRoleRef, &out.TaskRoleRef
+		*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+		(*in).DeepCopyInto(*out)
 	}
 }
 
@@ -1382,6 +1403,11 @@ func (in *PipeSpec) DeepCopyInto(out *PipeSpec) {
 		in, out := &in.RoleARN, &out.RoleARN
 		*out = new(string)
 		**out = **in
+	}
+	if in.RoleRef != nil {
+		in, out := &in.RoleRef, &out.RoleRef
+		*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Source != nil {
 		in, out := &in.Source, &out.Source
@@ -2281,6 +2307,17 @@ func (in *SelfManagedKafkaAccessConfigurationVPC) DeepCopyInto(out *SelfManagedK
 				in, out := &(*in)[i], &(*out)[i]
 				*out = new(string)
 				**out = **in
+			}
+		}
+	}
+	if in.SubnetRefs != nil {
+		in, out := &in.SubnetRefs, &out.SubnetRefs
+		*out = make([]*corev1alpha1.AWSResourceReferenceWrapper, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}

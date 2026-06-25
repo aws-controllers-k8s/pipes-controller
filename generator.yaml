@@ -11,6 +11,31 @@ sdk_names:
 resources:
   Pipe:
     fields:
+      RoleARN:
+        references:
+          resource: Role
+          service_name: iam
+          path: Status.ACKResourceMetadata.ARN
+      TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN:
+        references:
+          resource: Role
+          service_name: iam
+          path: Status.ACKResourceMetadata.ARN
+      TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN:
+        references:
+          resource: Role
+          service_name: iam
+          path: Status.ACKResourceMetadata.ARN
+      TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups:
+        references:
+          resource: SecurityGroup
+          service_name: ec2
+          path: Status.ID
+      SourceParameters.SelfManagedKafkaParameters.VPC.Subnets:
+        references:
+          resource: Subnet
+          service_name: ec2
+          path: Status.SubnetID
       DesiredState:
         compare:
           is_ignored: true
