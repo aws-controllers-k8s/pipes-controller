@@ -150,6 +150,54 @@ func (rm *resourceManager) sdkFind(
 	} else {
 		ko.Status.LastModifiedTime = nil
 	}
+	if resp.LogConfiguration != nil {
+		f9 := &svcapitypes.PipeLogConfigurationParameters{}
+		if resp.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			f9f0 := &svcapitypes.CloudwatchLogsLogDestinationParameters{}
+			if resp.LogConfiguration.CloudwatchLogsLogDestination.LogGroupArn != nil {
+				f9f0.LogGroupARN = resp.LogConfiguration.CloudwatchLogsLogDestination.LogGroupArn
+			}
+			f9.CloudwatchLogsLogDestination = f9f0
+		}
+		if resp.LogConfiguration.FirehoseLogDestination != nil {
+			f9f1 := &svcapitypes.FirehoseLogDestinationParameters{}
+			if resp.LogConfiguration.FirehoseLogDestination.DeliveryStreamArn != nil {
+				f9f1.DeliveryStreamARN = resp.LogConfiguration.FirehoseLogDestination.DeliveryStreamArn
+			}
+			f9.FirehoseLogDestination = f9f1
+		}
+		if resp.LogConfiguration.IncludeExecutionData != nil {
+			f9f2 := []*string{}
+			for _, f9f2iter := range resp.LogConfiguration.IncludeExecutionData {
+				var f9f2elem *string
+				f9f2elem = aws.String(string(f9f2iter))
+				f9f2 = append(f9f2, f9f2elem)
+			}
+			f9.IncludeExecutionData = f9f2
+		}
+		if resp.LogConfiguration.Level != "" {
+			f9.Level = aws.String(string(resp.LogConfiguration.Level))
+		}
+		if resp.LogConfiguration.S3LogDestination != nil {
+			f9f4 := &svcapitypes.S3LogDestinationParameters{}
+			if resp.LogConfiguration.S3LogDestination.BucketName != nil {
+				f9f4.BucketName = resp.LogConfiguration.S3LogDestination.BucketName
+			}
+			if resp.LogConfiguration.S3LogDestination.BucketOwner != nil {
+				f9f4.BucketOwner = resp.LogConfiguration.S3LogDestination.BucketOwner
+			}
+			if resp.LogConfiguration.S3LogDestination.OutputFormat != "" {
+				f9f4.OutputFormat = aws.String(string(resp.LogConfiguration.S3LogDestination.OutputFormat))
+			}
+			if resp.LogConfiguration.S3LogDestination.Prefix != nil {
+				f9f4.Prefix = resp.LogConfiguration.S3LogDestination.Prefix
+			}
+			f9.S3LogDestination = f9f4
+		}
+		ko.Spec.LogConfiguration = f9
+	} else {
+		ko.Spec.LogConfiguration = nil
+	}
 	if resp.Name != nil {
 		ko.Spec.Name = resp.Name
 	} else {
@@ -988,6 +1036,52 @@ func (rm *resourceManager) newCreateRequestPayload(
 		}
 		res.EnrichmentParameters = f3
 	}
+	if r.ko.Spec.LogConfiguration != nil {
+		f4 := &svcsdktypes.PipeLogConfigurationParameters{}
+		if r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			f4f0 := &svcsdktypes.CloudwatchLogsLogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != nil {
+				f4f0.LogGroupArn = r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN
+			}
+			f4.CloudwatchLogsLogDestination = f4f0
+		}
+		if r.ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			f4f1 := &svcsdktypes.FirehoseLogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != nil {
+				f4f1.DeliveryStreamArn = r.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN
+			}
+			f4.FirehoseLogDestination = f4f1
+		}
+		if r.ko.Spec.LogConfiguration.IncludeExecutionData != nil {
+			f4f2 := []svcsdktypes.IncludeExecutionDataOption{}
+			for _, f4f2iter := range r.ko.Spec.LogConfiguration.IncludeExecutionData {
+				var f4f2elem string
+				f4f2elem = string(*f4f2iter)
+				f4f2 = append(f4f2, svcsdktypes.IncludeExecutionDataOption(f4f2elem))
+			}
+			f4.IncludeExecutionData = f4f2
+		}
+		if r.ko.Spec.LogConfiguration.Level != nil {
+			f4.Level = svcsdktypes.LogLevel(*r.ko.Spec.LogConfiguration.Level)
+		}
+		if r.ko.Spec.LogConfiguration.S3LogDestination != nil {
+			f4f4 := &svcsdktypes.S3LogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.BucketName != nil {
+				f4f4.BucketName = r.ko.Spec.LogConfiguration.S3LogDestination.BucketName
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner != nil {
+				f4f4.BucketOwner = r.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat != nil {
+				f4f4.OutputFormat = svcsdktypes.S3OutputFormat(*r.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat)
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil {
+				f4f4.Prefix = r.ko.Spec.LogConfiguration.S3LogDestination.Prefix
+			}
+			f4.S3LogDestination = f4f4
+		}
+		res.LogConfiguration = f4
+	}
 	if r.ko.Spec.Name != nil {
 		res.Name = r.ko.Spec.Name
 	}
@@ -998,30 +1092,30 @@ func (rm *resourceManager) newCreateRequestPayload(
 		res.Source = r.ko.Spec.Source
 	}
 	if r.ko.Spec.SourceParameters != nil {
-		f7 := &svcsdktypes.PipeSourceParameters{}
+		f8 := &svcsdktypes.PipeSourceParameters{}
 		if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters != nil {
-			f7f0 := &svcsdktypes.PipeSourceActiveMQBrokerParameters{}
+			f8f0 := &svcsdktypes.PipeSourceActiveMQBrokerParameters{}
 			if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f0.BatchSize = &batchSizeCopy
+				f8f0.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials != nil {
-				var f7f0f1 svcsdktypes.MQBrokerAccessCredentials
+				var f8f0f1 svcsdktypes.MQBrokerAccessCredentials
 				isInterfaceSet := false
 				if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for BasicAuth"))
 					}
-					f7f0f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
-					f7f0f1f0Parent.Value = *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth
-					f7f0f1 = f7f0f1f0Parent
+					f8f0f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
+					f8f0f1f0Parent.Value = *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.Credentials.BasicAuth
+					f8f0f1 = f8f0f1f0Parent
 					isInterfaceSet = true
 				}
-				f7f0.Credentials = f7f0f1
+				f8f0.Credentials = f8f0f1
 			}
 			if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.MaximumBatchingWindowInSeconds
@@ -1029,29 +1123,29 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f0.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f0.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.QueueName != nil {
-				f7f0.QueueName = r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.QueueName
+				f8f0.QueueName = r.ko.Spec.SourceParameters.ActiveMQBrokerParameters.QueueName
 			}
-			f7.ActiveMQBrokerParameters = f7f0
+			f8.ActiveMQBrokerParameters = f8f0
 		}
 		if r.ko.Spec.SourceParameters.DynamoDBStreamParameters != nil {
-			f7f1 := &svcsdktypes.PipeSourceDynamoDBStreamParameters{}
+			f8f1 := &svcsdktypes.PipeSourceDynamoDBStreamParameters{}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.DynamoDBStreamParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f1.BatchSize = &batchSizeCopy
+				f8f1.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.DeadLetterConfig != nil {
-				f7f1f1 := &svcsdktypes.DeadLetterConfig{}
+				f8f1f1 := &svcsdktypes.DeadLetterConfig{}
 				if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.DeadLetterConfig.ARN != nil {
-					f7f1f1.Arn = r.ko.Spec.SourceParameters.DynamoDBStreamParameters.DeadLetterConfig.ARN
+					f8f1f1.Arn = r.ko.Spec.SourceParameters.DynamoDBStreamParameters.DeadLetterConfig.ARN
 				}
-				f7f1.DeadLetterConfig = f7f1f1
+				f8f1.DeadLetterConfig = f8f1f1
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumBatchingWindowInSeconds
@@ -1059,7 +1153,7 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f1.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f1.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumRecordAgeInSeconds != nil {
 				maximumRecordAgeInSecondsCopy0 := *r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumRecordAgeInSeconds
@@ -1067,7 +1161,7 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumRecordAgeInSeconds is of type int32")
 				}
 				maximumRecordAgeInSecondsCopy := int32(maximumRecordAgeInSecondsCopy0)
-				f7f1.MaximumRecordAgeInSeconds = &maximumRecordAgeInSecondsCopy
+				f8f1.MaximumRecordAgeInSeconds = &maximumRecordAgeInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumRetryAttempts != nil {
 				maximumRetryAttemptsCopy0 := *r.ko.Spec.SourceParameters.DynamoDBStreamParameters.MaximumRetryAttempts
@@ -1075,10 +1169,10 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumRetryAttempts is of type int32")
 				}
 				maximumRetryAttemptsCopy := int32(maximumRetryAttemptsCopy0)
-				f7f1.MaximumRetryAttempts = &maximumRetryAttemptsCopy
+				f8f1.MaximumRetryAttempts = &maximumRetryAttemptsCopy
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.OnPartialBatchItemFailure != nil {
-				f7f1.OnPartialBatchItemFailure = svcsdktypes.OnPartialBatchItemFailureStreams(*r.ko.Spec.SourceParameters.DynamoDBStreamParameters.OnPartialBatchItemFailure)
+				f8f1.OnPartialBatchItemFailure = svcsdktypes.OnPartialBatchItemFailureStreams(*r.ko.Spec.SourceParameters.DynamoDBStreamParameters.OnPartialBatchItemFailure)
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.ParallelizationFactor != nil {
 				parallelizationFactorCopy0 := *r.ko.Spec.SourceParameters.DynamoDBStreamParameters.ParallelizationFactor
@@ -1086,44 +1180,44 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field ParallelizationFactor is of type int32")
 				}
 				parallelizationFactorCopy := int32(parallelizationFactorCopy0)
-				f7f1.ParallelizationFactor = &parallelizationFactorCopy
+				f8f1.ParallelizationFactor = &parallelizationFactorCopy
 			}
 			if r.ko.Spec.SourceParameters.DynamoDBStreamParameters.StartingPosition != nil {
-				f7f1.StartingPosition = svcsdktypes.DynamoDBStreamStartPosition(*r.ko.Spec.SourceParameters.DynamoDBStreamParameters.StartingPosition)
+				f8f1.StartingPosition = svcsdktypes.DynamoDBStreamStartPosition(*r.ko.Spec.SourceParameters.DynamoDBStreamParameters.StartingPosition)
 			}
-			f7.DynamoDBStreamParameters = f7f1
+			f8.DynamoDBStreamParameters = f8f1
 		}
 		if r.ko.Spec.SourceParameters.FilterCriteria != nil {
-			f7f2 := &svcsdktypes.FilterCriteria{}
+			f8f2 := &svcsdktypes.FilterCriteria{}
 			if r.ko.Spec.SourceParameters.FilterCriteria.Filters != nil {
-				f7f2f0 := []svcsdktypes.Filter{}
-				for _, f7f2f0iter := range r.ko.Spec.SourceParameters.FilterCriteria.Filters {
-					f7f2f0elem := &svcsdktypes.Filter{}
-					if f7f2f0iter.Pattern != nil {
-						f7f2f0elem.Pattern = f7f2f0iter.Pattern
+				f8f2f0 := []svcsdktypes.Filter{}
+				for _, f8f2f0iter := range r.ko.Spec.SourceParameters.FilterCriteria.Filters {
+					f8f2f0elem := &svcsdktypes.Filter{}
+					if f8f2f0iter.Pattern != nil {
+						f8f2f0elem.Pattern = f8f2f0iter.Pattern
 					}
-					f7f2f0 = append(f7f2f0, *f7f2f0elem)
+					f8f2f0 = append(f8f2f0, *f8f2f0elem)
 				}
-				f7f2.Filters = f7f2f0
+				f8f2.Filters = f8f2f0
 			}
-			f7.FilterCriteria = f7f2
+			f8.FilterCriteria = f8f2
 		}
 		if r.ko.Spec.SourceParameters.KinesisStreamParameters != nil {
-			f7f3 := &svcsdktypes.PipeSourceKinesisStreamParameters{}
+			f8f3 := &svcsdktypes.PipeSourceKinesisStreamParameters{}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.KinesisStreamParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f3.BatchSize = &batchSizeCopy
+				f8f3.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.DeadLetterConfig != nil {
-				f7f3f1 := &svcsdktypes.DeadLetterConfig{}
+				f8f3f1 := &svcsdktypes.DeadLetterConfig{}
 				if r.ko.Spec.SourceParameters.KinesisStreamParameters.DeadLetterConfig.ARN != nil {
-					f7f3f1.Arn = r.ko.Spec.SourceParameters.KinesisStreamParameters.DeadLetterConfig.ARN
+					f8f3f1.Arn = r.ko.Spec.SourceParameters.KinesisStreamParameters.DeadLetterConfig.ARN
 				}
-				f7f3.DeadLetterConfig = f7f3f1
+				f8f3.DeadLetterConfig = f8f3f1
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumBatchingWindowInSeconds
@@ -1131,7 +1225,7 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f3.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f3.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumRecordAgeInSeconds != nil {
 				maximumRecordAgeInSecondsCopy0 := *r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumRecordAgeInSeconds
@@ -1139,7 +1233,7 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumRecordAgeInSeconds is of type int32")
 				}
 				maximumRecordAgeInSecondsCopy := int32(maximumRecordAgeInSecondsCopy0)
-				f7f3.MaximumRecordAgeInSeconds = &maximumRecordAgeInSecondsCopy
+				f8f3.MaximumRecordAgeInSeconds = &maximumRecordAgeInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumRetryAttempts != nil {
 				maximumRetryAttemptsCopy0 := *r.ko.Spec.SourceParameters.KinesisStreamParameters.MaximumRetryAttempts
@@ -1147,10 +1241,10 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumRetryAttempts is of type int32")
 				}
 				maximumRetryAttemptsCopy := int32(maximumRetryAttemptsCopy0)
-				f7f3.MaximumRetryAttempts = &maximumRetryAttemptsCopy
+				f8f3.MaximumRetryAttempts = &maximumRetryAttemptsCopy
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.OnPartialBatchItemFailure != nil {
-				f7f3.OnPartialBatchItemFailure = svcsdktypes.OnPartialBatchItemFailureStreams(*r.ko.Spec.SourceParameters.KinesisStreamParameters.OnPartialBatchItemFailure)
+				f8f3.OnPartialBatchItemFailure = svcsdktypes.OnPartialBatchItemFailureStreams(*r.ko.Spec.SourceParameters.KinesisStreamParameters.OnPartialBatchItemFailure)
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.ParallelizationFactor != nil {
 				parallelizationFactorCopy0 := *r.ko.Spec.SourceParameters.KinesisStreamParameters.ParallelizationFactor
@@ -1158,51 +1252,51 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field ParallelizationFactor is of type int32")
 				}
 				parallelizationFactorCopy := int32(parallelizationFactorCopy0)
-				f7f3.ParallelizationFactor = &parallelizationFactorCopy
+				f8f3.ParallelizationFactor = &parallelizationFactorCopy
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPosition != nil {
-				f7f3.StartingPosition = svcsdktypes.KinesisStreamStartPosition(*r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPosition)
+				f8f3.StartingPosition = svcsdktypes.KinesisStreamStartPosition(*r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPosition)
 			}
 			if r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPositionTimestamp != nil {
-				f7f3.StartingPositionTimestamp = &r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPositionTimestamp.Time
+				f8f3.StartingPositionTimestamp = &r.ko.Spec.SourceParameters.KinesisStreamParameters.StartingPositionTimestamp.Time
 			}
-			f7.KinesisStreamParameters = f7f3
+			f8.KinesisStreamParameters = f8f3
 		}
 		if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters != nil {
-			f7f4 := &svcsdktypes.PipeSourceManagedStreamingKafkaParameters{}
+			f8f4 := &svcsdktypes.PipeSourceManagedStreamingKafkaParameters{}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f4.BatchSize = &batchSizeCopy
+				f8f4.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.ConsumerGroupID != nil {
-				f7f4.ConsumerGroupID = r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.ConsumerGroupID
+				f8f4.ConsumerGroupID = r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.ConsumerGroupID
 			}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials != nil {
-				var f7f4f2 svcsdktypes.MSKAccessCredentials
+				var f8f4f2 svcsdktypes.MSKAccessCredentials
 				isInterfaceSet := false
 				if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTLSAuth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for ClientCertificateTlsAuth"))
 					}
-					f7f4f2f0Parent := &svcsdktypes.MSKAccessCredentialsMemberClientCertificateTlsAuth{}
-					f7f4f2f0Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTLSAuth
-					f7f4f2 = f7f4f2f0Parent
+					f8f4f2f0Parent := &svcsdktypes.MSKAccessCredentialsMemberClientCertificateTlsAuth{}
+					f8f4f2f0Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f8f4f2 = f8f4f2f0Parent
 					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for SaslScram512Auth"))
 					}
-					f7f4f2f1Parent := &svcsdktypes.MSKAccessCredentialsMemberSaslScram512Auth{}
-					f7f4f2f1Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth
-					f7f4f2 = f7f4f2f1Parent
+					f8f4f2f1Parent := &svcsdktypes.MSKAccessCredentialsMemberSaslScram512Auth{}
+					f8f4f2f1Parent.Value = *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.Credentials.SASLSCRAM512Auth
+					f8f4f2 = f8f4f2f1Parent
 					isInterfaceSet = true
 				}
-				f7f4.Credentials = f7f4f2
+				f8f4.Credentials = f8f4f2
 			}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.MaximumBatchingWindowInSeconds
@@ -1210,39 +1304,39 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f4.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f4.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.StartingPosition != nil {
-				f7f4.StartingPosition = svcsdktypes.MSKStartPosition(*r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.StartingPosition)
+				f8f4.StartingPosition = svcsdktypes.MSKStartPosition(*r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.StartingPosition)
 			}
 			if r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.TopicName != nil {
-				f7f4.TopicName = r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.TopicName
+				f8f4.TopicName = r.ko.Spec.SourceParameters.ManagedStreamingKafkaParameters.TopicName
 			}
-			f7.ManagedStreamingKafkaParameters = f7f4
+			f8.ManagedStreamingKafkaParameters = f8f4
 		}
 		if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters != nil {
-			f7f5 := &svcsdktypes.PipeSourceRabbitMQBrokerParameters{}
+			f8f5 := &svcsdktypes.PipeSourceRabbitMQBrokerParameters{}
 			if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f5.BatchSize = &batchSizeCopy
+				f8f5.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials != nil {
-				var f7f5f1 svcsdktypes.MQBrokerAccessCredentials
+				var f8f5f1 svcsdktypes.MQBrokerAccessCredentials
 				isInterfaceSet := false
 				if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials.BasicAuth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for BasicAuth"))
 					}
-					f7f5f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
-					f7f5f1f0Parent.Value = *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials.BasicAuth
-					f7f5f1 = f7f5f1f0Parent
+					f8f5f1f0Parent := &svcsdktypes.MQBrokerAccessCredentialsMemberBasicAuth{}
+					f8f5f1f0Parent.Value = *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.Credentials.BasicAuth
+					f8f5f1 = f8f5f1f0Parent
 					isInterfaceSet = true
 				}
-				f7f5.Credentials = f7f5f1
+				f8f5.Credentials = f8f5f1
 			}
 			if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.MaximumBatchingWindowInSeconds
@@ -1250,20 +1344,20 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f5.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f5.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.QueueName != nil {
-				f7f5.QueueName = r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.QueueName
+				f8f5.QueueName = r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.QueueName
 			}
 			if r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.VirtualHost != nil {
-				f7f5.VirtualHost = r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.VirtualHost
+				f8f5.VirtualHost = r.ko.Spec.SourceParameters.RabbitMQBrokerParameters.VirtualHost
 			}
-			f7.RabbitMQBrokerParameters = f7f5
+			f8.RabbitMQBrokerParameters = f8f5
 		}
 		if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters != nil {
-			f7f6 := &svcsdktypes.PipeSourceSelfManagedKafkaParameters{}
+			f8f6 := &svcsdktypes.PipeSourceSelfManagedKafkaParameters{}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.AdditionalBootstrapServers != nil {
-				f7f6.AdditionalBootstrapServers = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.AdditionalBootstrapServers)
+				f8f6.AdditionalBootstrapServers = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.AdditionalBootstrapServers)
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.BatchSize
@@ -1271,51 +1365,51 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f6.BatchSize = &batchSizeCopy
+				f8f6.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ConsumerGroupID != nil {
-				f7f6.ConsumerGroupID = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ConsumerGroupID
+				f8f6.ConsumerGroupID = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ConsumerGroupID
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials != nil {
-				var f7f6f3 svcsdktypes.SelfManagedKafkaAccessConfigurationCredentials
+				var f8f6f3 svcsdktypes.SelfManagedKafkaAccessConfigurationCredentials
 				isInterfaceSet := false
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.BasicAuth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for BasicAuth"))
 					}
-					f7f6f3f0Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberBasicAuth{}
-					f7f6f3f0Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.BasicAuth
-					f7f6f3 = f7f6f3f0Parent
+					f8f6f3f0Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberBasicAuth{}
+					f8f6f3f0Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.BasicAuth
+					f8f6f3 = f8f6f3f0Parent
 					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for ClientCertificateTlsAuth"))
 					}
-					f7f6f3f1Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberClientCertificateTlsAuth{}
-					f7f6f3f1Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth
-					f7f6f3 = f7f6f3f1Parent
+					f8f6f3f1Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberClientCertificateTlsAuth{}
+					f8f6f3f1Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.ClientCertificateTLSAuth
+					f8f6f3 = f8f6f3f1Parent
 					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for SaslScram256Auth"))
 					}
-					f7f6f3f2Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram256Auth{}
-					f7f6f3f2Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth
-					f7f6f3 = f7f6f3f2Parent
+					f8f6f3f2Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram256Auth{}
+					f8f6f3f2Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM256Auth
+					f8f6f3 = f8f6f3f2Parent
 					isInterfaceSet = true
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth != nil {
 					if isInterfaceSet {
 						return nil, ackerr.NewTerminalError(fmt.Errorf("can only set one of the members for SaslScram512Auth"))
 					}
-					f7f6f3f3Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram512Auth{}
-					f7f6f3f3Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth
-					f7f6f3 = f7f6f3f3Parent
+					f8f6f3f3Parent := &svcsdktypes.SelfManagedKafkaAccessConfigurationCredentialsMemberSaslScram512Auth{}
+					f8f6f3f3Parent.Value = *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.Credentials.SASLSCRAM512Auth
+					f8f6f3 = f8f6f3f3Parent
 					isInterfaceSet = true
 				}
-				f7f6.Credentials = f7f6f3
+				f8f6.Credentials = f8f6f3
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.MaximumBatchingWindowInSeconds
@@ -1323,38 +1417,38 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f6.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f6.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ServerRootCaCertificate != nil {
-				f7f6.ServerRootCaCertificate = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ServerRootCaCertificate
+				f8f6.ServerRootCaCertificate = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.ServerRootCaCertificate
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.StartingPosition != nil {
-				f7f6.StartingPosition = svcsdktypes.SelfManagedKafkaStartPosition(*r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.StartingPosition)
+				f8f6.StartingPosition = svcsdktypes.SelfManagedKafkaStartPosition(*r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.StartingPosition)
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.TopicName != nil {
-				f7f6.TopicName = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.TopicName
+				f8f6.TopicName = r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.TopicName
 			}
 			if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC != nil {
-				f7f6f8 := &svcsdktypes.SelfManagedKafkaAccessConfigurationVpc{}
+				f8f6f8 := &svcsdktypes.SelfManagedKafkaAccessConfigurationVpc{}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SecurityGroup != nil {
-					f7f6f8.SecurityGroup = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SecurityGroup)
+					f8f6f8.SecurityGroup = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SecurityGroup)
 				}
 				if r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets != nil {
-					f7f6f8.Subnets = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets)
+					f8f6f8.Subnets = aws.ToStringSlice(r.ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets)
 				}
-				f7f6.Vpc = f7f6f8
+				f8f6.Vpc = f8f6f8
 			}
-			f7.SelfManagedKafkaParameters = f7f6
+			f8.SelfManagedKafkaParameters = f8f6
 		}
 		if r.ko.Spec.SourceParameters.SQSQueueParameters != nil {
-			f7f7 := &svcsdktypes.PipeSourceSqsQueueParameters{}
+			f8f7 := &svcsdktypes.PipeSourceSqsQueueParameters{}
 			if r.ko.Spec.SourceParameters.SQSQueueParameters.BatchSize != nil {
 				batchSizeCopy0 := *r.ko.Spec.SourceParameters.SQSQueueParameters.BatchSize
 				if batchSizeCopy0 > math.MaxInt32 || batchSizeCopy0 < math.MinInt32 {
 					return nil, fmt.Errorf("error: field BatchSize is of type int32")
 				}
 				batchSizeCopy := int32(batchSizeCopy0)
-				f7f7.BatchSize = &batchSizeCopy
+				f8f7.BatchSize = &batchSizeCopy
 			}
 			if r.ko.Spec.SourceParameters.SQSQueueParameters.MaximumBatchingWindowInSeconds != nil {
 				maximumBatchingWindowInSecondsCopy0 := *r.ko.Spec.SourceParameters.SQSQueueParameters.MaximumBatchingWindowInSeconds
@@ -1362,11 +1456,11 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field MaximumBatchingWindowInSeconds is of type int32")
 				}
 				maximumBatchingWindowInSecondsCopy := int32(maximumBatchingWindowInSecondsCopy0)
-				f7f7.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
+				f8f7.MaximumBatchingWindowInSeconds = &maximumBatchingWindowInSecondsCopy
 			}
-			f7.SqsQueueParameters = f7f7
+			f8.SqsQueueParameters = f8f7
 		}
-		res.SourceParameters = f7
+		res.SourceParameters = f8
 	}
 	if r.ko.Spec.Tags != nil {
 		res.Tags = aws.ToStringMap(r.ko.Spec.Tags)
@@ -1375,336 +1469,336 @@ func (rm *resourceManager) newCreateRequestPayload(
 		res.Target = r.ko.Spec.Target
 	}
 	if r.ko.Spec.TargetParameters != nil {
-		f10 := &svcsdktypes.PipeTargetParameters{}
+		f11 := &svcsdktypes.PipeTargetParameters{}
 		if r.ko.Spec.TargetParameters.BatchJobParameters != nil {
-			f10f0 := &svcsdktypes.PipeTargetBatchJobParameters{}
+			f11f0 := &svcsdktypes.PipeTargetBatchJobParameters{}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.ArrayProperties != nil {
-				f10f0f0 := &svcsdktypes.BatchArrayProperties{}
+				f11f0f0 := &svcsdktypes.BatchArrayProperties{}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.ArrayProperties.Size != nil {
 					sizeCopy0 := *r.ko.Spec.TargetParameters.BatchJobParameters.ArrayProperties.Size
 					if sizeCopy0 > math.MaxInt32 || sizeCopy0 < math.MinInt32 {
 						return nil, fmt.Errorf("error: field Size is of type int32")
 					}
 					sizeCopy := int32(sizeCopy0)
-					f10f0f0.Size = &sizeCopy
+					f11f0f0.Size = &sizeCopy
 				}
-				f10f0.ArrayProperties = f10f0f0
+				f11f0.ArrayProperties = f11f0f0
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides != nil {
-				f10f0f1 := &svcsdktypes.BatchContainerOverrides{}
+				f11f0f1 := &svcsdktypes.BatchContainerOverrides{}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Command != nil {
-					f10f0f1.Command = aws.ToStringSlice(r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Command)
+					f11f0f1.Command = aws.ToStringSlice(r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Command)
 				}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Environment != nil {
-					f10f0f1f1 := []svcsdktypes.BatchEnvironmentVariable{}
-					for _, f10f0f1f1iter := range r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Environment {
-						f10f0f1f1elem := &svcsdktypes.BatchEnvironmentVariable{}
-						if f10f0f1f1iter.Name != nil {
-							f10f0f1f1elem.Name = f10f0f1f1iter.Name
+					f11f0f1f1 := []svcsdktypes.BatchEnvironmentVariable{}
+					for _, f11f0f1f1iter := range r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.Environment {
+						f11f0f1f1elem := &svcsdktypes.BatchEnvironmentVariable{}
+						if f11f0f1f1iter.Name != nil {
+							f11f0f1f1elem.Name = f11f0f1f1iter.Name
 						}
-						if f10f0f1f1iter.Value != nil {
-							f10f0f1f1elem.Value = f10f0f1f1iter.Value
+						if f11f0f1f1iter.Value != nil {
+							f11f0f1f1elem.Value = f11f0f1f1iter.Value
 						}
-						f10f0f1f1 = append(f10f0f1f1, *f10f0f1f1elem)
+						f11f0f1f1 = append(f11f0f1f1, *f11f0f1f1elem)
 					}
-					f10f0f1.Environment = f10f0f1f1
+					f11f0f1.Environment = f11f0f1f1
 				}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.InstanceType != nil {
-					f10f0f1.InstanceType = r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.InstanceType
+					f11f0f1.InstanceType = r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.InstanceType
 				}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.ResourceRequirements != nil {
-					f10f0f1f3 := []svcsdktypes.BatchResourceRequirement{}
-					for _, f10f0f1f3iter := range r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.ResourceRequirements {
-						f10f0f1f3elem := &svcsdktypes.BatchResourceRequirement{}
-						if f10f0f1f3iter.Type != nil {
-							f10f0f1f3elem.Type = svcsdktypes.BatchResourceRequirementType(*f10f0f1f3iter.Type)
+					f11f0f1f3 := []svcsdktypes.BatchResourceRequirement{}
+					for _, f11f0f1f3iter := range r.ko.Spec.TargetParameters.BatchJobParameters.ContainerOverrides.ResourceRequirements {
+						f11f0f1f3elem := &svcsdktypes.BatchResourceRequirement{}
+						if f11f0f1f3iter.Type != nil {
+							f11f0f1f3elem.Type = svcsdktypes.BatchResourceRequirementType(*f11f0f1f3iter.Type)
 						}
-						if f10f0f1f3iter.Value != nil {
-							f10f0f1f3elem.Value = f10f0f1f3iter.Value
+						if f11f0f1f3iter.Value != nil {
+							f11f0f1f3elem.Value = f11f0f1f3iter.Value
 						}
-						f10f0f1f3 = append(f10f0f1f3, *f10f0f1f3elem)
+						f11f0f1f3 = append(f11f0f1f3, *f11f0f1f3elem)
 					}
-					f10f0f1.ResourceRequirements = f10f0f1f3
+					f11f0f1.ResourceRequirements = f11f0f1f3
 				}
-				f10f0.ContainerOverrides = f10f0f1
+				f11f0.ContainerOverrides = f11f0f1
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.DependsOn != nil {
-				f10f0f2 := []svcsdktypes.BatchJobDependency{}
-				for _, f10f0f2iter := range r.ko.Spec.TargetParameters.BatchJobParameters.DependsOn {
-					f10f0f2elem := &svcsdktypes.BatchJobDependency{}
-					if f10f0f2iter.JobID != nil {
-						f10f0f2elem.JobId = f10f0f2iter.JobID
+				f11f0f2 := []svcsdktypes.BatchJobDependency{}
+				for _, f11f0f2iter := range r.ko.Spec.TargetParameters.BatchJobParameters.DependsOn {
+					f11f0f2elem := &svcsdktypes.BatchJobDependency{}
+					if f11f0f2iter.JobID != nil {
+						f11f0f2elem.JobId = f11f0f2iter.JobID
 					}
-					if f10f0f2iter.Type != nil {
-						f10f0f2elem.Type = svcsdktypes.BatchJobDependencyType(*f10f0f2iter.Type)
+					if f11f0f2iter.Type != nil {
+						f11f0f2elem.Type = svcsdktypes.BatchJobDependencyType(*f11f0f2iter.Type)
 					}
-					f10f0f2 = append(f10f0f2, *f10f0f2elem)
+					f11f0f2 = append(f11f0f2, *f11f0f2elem)
 				}
-				f10f0.DependsOn = f10f0f2
+				f11f0.DependsOn = f11f0f2
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.JobDefinition != nil {
-				f10f0.JobDefinition = r.ko.Spec.TargetParameters.BatchJobParameters.JobDefinition
+				f11f0.JobDefinition = r.ko.Spec.TargetParameters.BatchJobParameters.JobDefinition
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.JobName != nil {
-				f10f0.JobName = r.ko.Spec.TargetParameters.BatchJobParameters.JobName
+				f11f0.JobName = r.ko.Spec.TargetParameters.BatchJobParameters.JobName
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.Parameters != nil {
-				f10f0.Parameters = aws.ToStringMap(r.ko.Spec.TargetParameters.BatchJobParameters.Parameters)
+				f11f0.Parameters = aws.ToStringMap(r.ko.Spec.TargetParameters.BatchJobParameters.Parameters)
 			}
 			if r.ko.Spec.TargetParameters.BatchJobParameters.RetryStrategy != nil {
-				f10f0f6 := &svcsdktypes.BatchRetryStrategy{}
+				f11f0f6 := &svcsdktypes.BatchRetryStrategy{}
 				if r.ko.Spec.TargetParameters.BatchJobParameters.RetryStrategy.Attempts != nil {
 					attemptsCopy0 := *r.ko.Spec.TargetParameters.BatchJobParameters.RetryStrategy.Attempts
 					if attemptsCopy0 > math.MaxInt32 || attemptsCopy0 < math.MinInt32 {
 						return nil, fmt.Errorf("error: field Attempts is of type int32")
 					}
 					attemptsCopy := int32(attemptsCopy0)
-					f10f0f6.Attempts = &attemptsCopy
+					f11f0f6.Attempts = &attemptsCopy
 				}
-				f10f0.RetryStrategy = f10f0f6
+				f11f0.RetryStrategy = f11f0f6
 			}
-			f10.BatchJobParameters = f10f0
+			f11.BatchJobParameters = f11f0
 		}
 		if r.ko.Spec.TargetParameters.CloudWatchLogsParameters != nil {
-			f10f1 := &svcsdktypes.PipeTargetCloudWatchLogsParameters{}
+			f11f1 := &svcsdktypes.PipeTargetCloudWatchLogsParameters{}
 			if r.ko.Spec.TargetParameters.CloudWatchLogsParameters.LogStreamName != nil {
-				f10f1.LogStreamName = r.ko.Spec.TargetParameters.CloudWatchLogsParameters.LogStreamName
+				f11f1.LogStreamName = r.ko.Spec.TargetParameters.CloudWatchLogsParameters.LogStreamName
 			}
 			if r.ko.Spec.TargetParameters.CloudWatchLogsParameters.Timestamp != nil {
-				f10f1.Timestamp = r.ko.Spec.TargetParameters.CloudWatchLogsParameters.Timestamp
+				f11f1.Timestamp = r.ko.Spec.TargetParameters.CloudWatchLogsParameters.Timestamp
 			}
-			f10.CloudWatchLogsParameters = f10f1
+			f11.CloudWatchLogsParameters = f11f1
 		}
 		if r.ko.Spec.TargetParameters.ECSTaskParameters != nil {
-			f10f2 := &svcsdktypes.PipeTargetEcsTaskParameters{}
+			f11f2 := &svcsdktypes.PipeTargetEcsTaskParameters{}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.CapacityProviderStrategy != nil {
-				f10f2f0 := []svcsdktypes.CapacityProviderStrategyItem{}
-				for _, f10f2f0iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.CapacityProviderStrategy {
-					f10f2f0elem := &svcsdktypes.CapacityProviderStrategyItem{}
-					if f10f2f0iter.Base != nil {
-						baseCopy0 := *f10f2f0iter.Base
+				f11f2f0 := []svcsdktypes.CapacityProviderStrategyItem{}
+				for _, f11f2f0iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.CapacityProviderStrategy {
+					f11f2f0elem := &svcsdktypes.CapacityProviderStrategyItem{}
+					if f11f2f0iter.Base != nil {
+						baseCopy0 := *f11f2f0iter.Base
 						if baseCopy0 > math.MaxInt32 || baseCopy0 < math.MinInt32 {
 							return nil, fmt.Errorf("error: field base is of type int32")
 						}
 						baseCopy := int32(baseCopy0)
-						f10f2f0elem.Base = baseCopy
+						f11f2f0elem.Base = baseCopy
 					}
-					if f10f2f0iter.CapacityProvider != nil {
-						f10f2f0elem.CapacityProvider = f10f2f0iter.CapacityProvider
+					if f11f2f0iter.CapacityProvider != nil {
+						f11f2f0elem.CapacityProvider = f11f2f0iter.CapacityProvider
 					}
-					if f10f2f0iter.Weight != nil {
-						weightCopy0 := *f10f2f0iter.Weight
+					if f11f2f0iter.Weight != nil {
+						weightCopy0 := *f11f2f0iter.Weight
 						if weightCopy0 > math.MaxInt32 || weightCopy0 < math.MinInt32 {
 							return nil, fmt.Errorf("error: field weight is of type int32")
 						}
 						weightCopy := int32(weightCopy0)
-						f10f2f0elem.Weight = weightCopy
+						f11f2f0elem.Weight = weightCopy
 					}
-					f10f2f0 = append(f10f2f0, *f10f2f0elem)
+					f11f2f0 = append(f11f2f0, *f11f2f0elem)
 				}
-				f10f2.CapacityProviderStrategy = f10f2f0
+				f11f2.CapacityProviderStrategy = f11f2f0
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.EnableECSManagedTags != nil {
-				f10f2.EnableECSManagedTags = *r.ko.Spec.TargetParameters.ECSTaskParameters.EnableECSManagedTags
+				f11f2.EnableECSManagedTags = *r.ko.Spec.TargetParameters.ECSTaskParameters.EnableECSManagedTags
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.EnableExecuteCommand != nil {
-				f10f2.EnableExecuteCommand = *r.ko.Spec.TargetParameters.ECSTaskParameters.EnableExecuteCommand
+				f11f2.EnableExecuteCommand = *r.ko.Spec.TargetParameters.ECSTaskParameters.EnableExecuteCommand
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.Group != nil {
-				f10f2.Group = r.ko.Spec.TargetParameters.ECSTaskParameters.Group
+				f11f2.Group = r.ko.Spec.TargetParameters.ECSTaskParameters.Group
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.LaunchType != nil {
-				f10f2.LaunchType = svcsdktypes.LaunchType(*r.ko.Spec.TargetParameters.ECSTaskParameters.LaunchType)
+				f11f2.LaunchType = svcsdktypes.LaunchType(*r.ko.Spec.TargetParameters.ECSTaskParameters.LaunchType)
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration != nil {
-				f10f2f5 := &svcsdktypes.NetworkConfiguration{}
+				f11f2f5 := &svcsdktypes.NetworkConfiguration{}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration != nil {
-					f10f2f5f0 := &svcsdktypes.AwsVpcConfiguration{}
+					f11f2f5f0 := &svcsdktypes.AwsVpcConfiguration{}
 					if r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.AssignPublicIP != nil {
-						f10f2f5f0.AssignPublicIp = svcsdktypes.AssignPublicIp(*r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.AssignPublicIP)
+						f11f2f5f0.AssignPublicIp = svcsdktypes.AssignPublicIp(*r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.AssignPublicIP)
 					}
 					if r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups != nil {
-						f10f2f5f0.SecurityGroups = aws.ToStringSlice(r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups)
+						f11f2f5f0.SecurityGroups = aws.ToStringSlice(r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups)
 					}
 					if r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.Subnets != nil {
-						f10f2f5f0.Subnets = aws.ToStringSlice(r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.Subnets)
+						f11f2f5f0.Subnets = aws.ToStringSlice(r.ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.Subnets)
 					}
-					f10f2f5.AwsvpcConfiguration = f10f2f5f0
+					f11f2f5.AwsvpcConfiguration = f11f2f5f0
 				}
-				f10f2.NetworkConfiguration = f10f2f5
+				f11f2.NetworkConfiguration = f11f2f5
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
-				f10f2f6 := &svcsdktypes.EcsTaskOverride{}
+				f11f2f6 := &svcsdktypes.EcsTaskOverride{}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ContainerOverrides != nil {
-					f10f2f6f0 := []svcsdktypes.EcsContainerOverride{}
-					for _, f10f2f6f0iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ContainerOverrides {
-						f10f2f6f0elem := &svcsdktypes.EcsContainerOverride{}
-						if f10f2f6f0iter.Command != nil {
-							f10f2f6f0elem.Command = aws.ToStringSlice(f10f2f6f0iter.Command)
+					f11f2f6f0 := []svcsdktypes.EcsContainerOverride{}
+					for _, f11f2f6f0iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ContainerOverrides {
+						f11f2f6f0elem := &svcsdktypes.EcsContainerOverride{}
+						if f11f2f6f0iter.Command != nil {
+							f11f2f6f0elem.Command = aws.ToStringSlice(f11f2f6f0iter.Command)
 						}
-						if f10f2f6f0iter.CPU != nil {
-							cpuCopy0 := *f10f2f6f0iter.CPU
+						if f11f2f6f0iter.CPU != nil {
+							cpuCopy0 := *f11f2f6f0iter.CPU
 							if cpuCopy0 > math.MaxInt32 || cpuCopy0 < math.MinInt32 {
 								return nil, fmt.Errorf("error: field Cpu is of type int32")
 							}
 							cpuCopy := int32(cpuCopy0)
-							f10f2f6f0elem.Cpu = &cpuCopy
+							f11f2f6f0elem.Cpu = &cpuCopy
 						}
-						if f10f2f6f0iter.Environment != nil {
-							f10f2f6f0elemf2 := []svcsdktypes.EcsEnvironmentVariable{}
-							for _, f10f2f6f0elemf2iter := range f10f2f6f0iter.Environment {
-								f10f2f6f0elemf2elem := &svcsdktypes.EcsEnvironmentVariable{}
-								if f10f2f6f0elemf2iter.Name != nil {
-									f10f2f6f0elemf2elem.Name = f10f2f6f0elemf2iter.Name
+						if f11f2f6f0iter.Environment != nil {
+							f11f2f6f0elemf2 := []svcsdktypes.EcsEnvironmentVariable{}
+							for _, f11f2f6f0elemf2iter := range f11f2f6f0iter.Environment {
+								f11f2f6f0elemf2elem := &svcsdktypes.EcsEnvironmentVariable{}
+								if f11f2f6f0elemf2iter.Name != nil {
+									f11f2f6f0elemf2elem.Name = f11f2f6f0elemf2iter.Name
 								}
-								if f10f2f6f0elemf2iter.Value != nil {
-									f10f2f6f0elemf2elem.Value = f10f2f6f0elemf2iter.Value
+								if f11f2f6f0elemf2iter.Value != nil {
+									f11f2f6f0elemf2elem.Value = f11f2f6f0elemf2iter.Value
 								}
-								f10f2f6f0elemf2 = append(f10f2f6f0elemf2, *f10f2f6f0elemf2elem)
+								f11f2f6f0elemf2 = append(f11f2f6f0elemf2, *f11f2f6f0elemf2elem)
 							}
-							f10f2f6f0elem.Environment = f10f2f6f0elemf2
+							f11f2f6f0elem.Environment = f11f2f6f0elemf2
 						}
-						if f10f2f6f0iter.EnvironmentFiles != nil {
-							f10f2f6f0elemf3 := []svcsdktypes.EcsEnvironmentFile{}
-							for _, f10f2f6f0elemf3iter := range f10f2f6f0iter.EnvironmentFiles {
-								f10f2f6f0elemf3elem := &svcsdktypes.EcsEnvironmentFile{}
-								if f10f2f6f0elemf3iter.Type != nil {
-									f10f2f6f0elemf3elem.Type = svcsdktypes.EcsEnvironmentFileType(*f10f2f6f0elemf3iter.Type)
+						if f11f2f6f0iter.EnvironmentFiles != nil {
+							f11f2f6f0elemf3 := []svcsdktypes.EcsEnvironmentFile{}
+							for _, f11f2f6f0elemf3iter := range f11f2f6f0iter.EnvironmentFiles {
+								f11f2f6f0elemf3elem := &svcsdktypes.EcsEnvironmentFile{}
+								if f11f2f6f0elemf3iter.Type != nil {
+									f11f2f6f0elemf3elem.Type = svcsdktypes.EcsEnvironmentFileType(*f11f2f6f0elemf3iter.Type)
 								}
-								if f10f2f6f0elemf3iter.Value != nil {
-									f10f2f6f0elemf3elem.Value = f10f2f6f0elemf3iter.Value
+								if f11f2f6f0elemf3iter.Value != nil {
+									f11f2f6f0elemf3elem.Value = f11f2f6f0elemf3iter.Value
 								}
-								f10f2f6f0elemf3 = append(f10f2f6f0elemf3, *f10f2f6f0elemf3elem)
+								f11f2f6f0elemf3 = append(f11f2f6f0elemf3, *f11f2f6f0elemf3elem)
 							}
-							f10f2f6f0elem.EnvironmentFiles = f10f2f6f0elemf3
+							f11f2f6f0elem.EnvironmentFiles = f11f2f6f0elemf3
 						}
-						if f10f2f6f0iter.Memory != nil {
-							memoryCopy0 := *f10f2f6f0iter.Memory
+						if f11f2f6f0iter.Memory != nil {
+							memoryCopy0 := *f11f2f6f0iter.Memory
 							if memoryCopy0 > math.MaxInt32 || memoryCopy0 < math.MinInt32 {
 								return nil, fmt.Errorf("error: field Memory is of type int32")
 							}
 							memoryCopy := int32(memoryCopy0)
-							f10f2f6f0elem.Memory = &memoryCopy
+							f11f2f6f0elem.Memory = &memoryCopy
 						}
-						if f10f2f6f0iter.MemoryReservation != nil {
-							memoryReservationCopy0 := *f10f2f6f0iter.MemoryReservation
+						if f11f2f6f0iter.MemoryReservation != nil {
+							memoryReservationCopy0 := *f11f2f6f0iter.MemoryReservation
 							if memoryReservationCopy0 > math.MaxInt32 || memoryReservationCopy0 < math.MinInt32 {
 								return nil, fmt.Errorf("error: field MemoryReservation is of type int32")
 							}
 							memoryReservationCopy := int32(memoryReservationCopy0)
-							f10f2f6f0elem.MemoryReservation = &memoryReservationCopy
+							f11f2f6f0elem.MemoryReservation = &memoryReservationCopy
 						}
-						if f10f2f6f0iter.Name != nil {
-							f10f2f6f0elem.Name = f10f2f6f0iter.Name
+						if f11f2f6f0iter.Name != nil {
+							f11f2f6f0elem.Name = f11f2f6f0iter.Name
 						}
-						if f10f2f6f0iter.ResourceRequirements != nil {
-							f10f2f6f0elemf7 := []svcsdktypes.EcsResourceRequirement{}
-							for _, f10f2f6f0elemf7iter := range f10f2f6f0iter.ResourceRequirements {
-								f10f2f6f0elemf7elem := &svcsdktypes.EcsResourceRequirement{}
-								if f10f2f6f0elemf7iter.Type != nil {
-									f10f2f6f0elemf7elem.Type = svcsdktypes.EcsResourceRequirementType(*f10f2f6f0elemf7iter.Type)
+						if f11f2f6f0iter.ResourceRequirements != nil {
+							f11f2f6f0elemf7 := []svcsdktypes.EcsResourceRequirement{}
+							for _, f11f2f6f0elemf7iter := range f11f2f6f0iter.ResourceRequirements {
+								f11f2f6f0elemf7elem := &svcsdktypes.EcsResourceRequirement{}
+								if f11f2f6f0elemf7iter.Type != nil {
+									f11f2f6f0elemf7elem.Type = svcsdktypes.EcsResourceRequirementType(*f11f2f6f0elemf7iter.Type)
 								}
-								if f10f2f6f0elemf7iter.Value != nil {
-									f10f2f6f0elemf7elem.Value = f10f2f6f0elemf7iter.Value
+								if f11f2f6f0elemf7iter.Value != nil {
+									f11f2f6f0elemf7elem.Value = f11f2f6f0elemf7iter.Value
 								}
-								f10f2f6f0elemf7 = append(f10f2f6f0elemf7, *f10f2f6f0elemf7elem)
+								f11f2f6f0elemf7 = append(f11f2f6f0elemf7, *f11f2f6f0elemf7elem)
 							}
-							f10f2f6f0elem.ResourceRequirements = f10f2f6f0elemf7
+							f11f2f6f0elem.ResourceRequirements = f11f2f6f0elemf7
 						}
-						f10f2f6f0 = append(f10f2f6f0, *f10f2f6f0elem)
+						f11f2f6f0 = append(f11f2f6f0, *f11f2f6f0elem)
 					}
-					f10f2f6.ContainerOverrides = f10f2f6f0
+					f11f2f6.ContainerOverrides = f11f2f6f0
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.CPU != nil {
-					f10f2f6.Cpu = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.CPU
+					f11f2f6.Cpu = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.CPU
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.EphemeralStorage != nil {
-					f10f2f6f2 := &svcsdktypes.EcsEphemeralStorage{}
+					f11f2f6f2 := &svcsdktypes.EcsEphemeralStorage{}
 					if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.EphemeralStorage.SizeInGiB != nil {
 						sizeInGiBCopy0 := *r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.EphemeralStorage.SizeInGiB
 						if sizeInGiBCopy0 > math.MaxInt32 || sizeInGiBCopy0 < math.MinInt32 {
 							return nil, fmt.Errorf("error: field sizeInGiB is of type int32")
 						}
 						sizeInGiBCopy := int32(sizeInGiBCopy0)
-						f10f2f6f2.SizeInGiB = &sizeInGiBCopy
+						f11f2f6f2.SizeInGiB = &sizeInGiBCopy
 					}
-					f10f2f6.EphemeralStorage = f10f2f6f2
+					f11f2f6.EphemeralStorage = f11f2f6f2
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN != nil {
-					f10f2f6.ExecutionRoleArn = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN
+					f11f2f6.ExecutionRoleArn = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.InferenceAcceleratorOverrides != nil {
-					f10f2f6f4 := []svcsdktypes.EcsInferenceAcceleratorOverride{}
-					for _, f10f2f6f4iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.InferenceAcceleratorOverrides {
-						f10f2f6f4elem := &svcsdktypes.EcsInferenceAcceleratorOverride{}
-						if f10f2f6f4iter.DeviceName != nil {
-							f10f2f6f4elem.DeviceName = f10f2f6f4iter.DeviceName
+					f11f2f6f4 := []svcsdktypes.EcsInferenceAcceleratorOverride{}
+					for _, f11f2f6f4iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.InferenceAcceleratorOverrides {
+						f11f2f6f4elem := &svcsdktypes.EcsInferenceAcceleratorOverride{}
+						if f11f2f6f4iter.DeviceName != nil {
+							f11f2f6f4elem.DeviceName = f11f2f6f4iter.DeviceName
 						}
-						if f10f2f6f4iter.DeviceType != nil {
-							f10f2f6f4elem.DeviceType = f10f2f6f4iter.DeviceType
+						if f11f2f6f4iter.DeviceType != nil {
+							f11f2f6f4elem.DeviceType = f11f2f6f4iter.DeviceType
 						}
-						f10f2f6f4 = append(f10f2f6f4, *f10f2f6f4elem)
+						f11f2f6f4 = append(f11f2f6f4, *f11f2f6f4elem)
 					}
-					f10f2f6.InferenceAcceleratorOverrides = f10f2f6f4
+					f11f2f6.InferenceAcceleratorOverrides = f11f2f6f4
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.Memory != nil {
-					f10f2f6.Memory = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.Memory
+					f11f2f6.Memory = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.Memory
 				}
 				if r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN != nil {
-					f10f2f6.TaskRoleArn = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN
+					f11f2f6.TaskRoleArn = r.ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN
 				}
-				f10f2.Overrides = f10f2f6
+				f11f2.Overrides = f11f2f6
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementConstraints != nil {
-				f10f2f7 := []svcsdktypes.PlacementConstraint{}
-				for _, f10f2f7iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementConstraints {
-					f10f2f7elem := &svcsdktypes.PlacementConstraint{}
-					if f10f2f7iter.Expression != nil {
-						f10f2f7elem.Expression = f10f2f7iter.Expression
+				f11f2f7 := []svcsdktypes.PlacementConstraint{}
+				for _, f11f2f7iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementConstraints {
+					f11f2f7elem := &svcsdktypes.PlacementConstraint{}
+					if f11f2f7iter.Expression != nil {
+						f11f2f7elem.Expression = f11f2f7iter.Expression
 					}
-					if f10f2f7iter.Type != nil {
-						f10f2f7elem.Type = svcsdktypes.PlacementConstraintType(*f10f2f7iter.Type)
+					if f11f2f7iter.Type != nil {
+						f11f2f7elem.Type = svcsdktypes.PlacementConstraintType(*f11f2f7iter.Type)
 					}
-					f10f2f7 = append(f10f2f7, *f10f2f7elem)
+					f11f2f7 = append(f11f2f7, *f11f2f7elem)
 				}
-				f10f2.PlacementConstraints = f10f2f7
+				f11f2.PlacementConstraints = f11f2f7
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementStrategy != nil {
-				f10f2f8 := []svcsdktypes.PlacementStrategy{}
-				for _, f10f2f8iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementStrategy {
-					f10f2f8elem := &svcsdktypes.PlacementStrategy{}
-					if f10f2f8iter.Field != nil {
-						f10f2f8elem.Field = f10f2f8iter.Field
+				f11f2f8 := []svcsdktypes.PlacementStrategy{}
+				for _, f11f2f8iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.PlacementStrategy {
+					f11f2f8elem := &svcsdktypes.PlacementStrategy{}
+					if f11f2f8iter.Field != nil {
+						f11f2f8elem.Field = f11f2f8iter.Field
 					}
-					if f10f2f8iter.Type != nil {
-						f10f2f8elem.Type = svcsdktypes.PlacementStrategyType(*f10f2f8iter.Type)
+					if f11f2f8iter.Type != nil {
+						f11f2f8elem.Type = svcsdktypes.PlacementStrategyType(*f11f2f8iter.Type)
 					}
-					f10f2f8 = append(f10f2f8, *f10f2f8elem)
+					f11f2f8 = append(f11f2f8, *f11f2f8elem)
 				}
-				f10f2.PlacementStrategy = f10f2f8
+				f11f2.PlacementStrategy = f11f2f8
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.PlatformVersion != nil {
-				f10f2.PlatformVersion = r.ko.Spec.TargetParameters.ECSTaskParameters.PlatformVersion
+				f11f2.PlatformVersion = r.ko.Spec.TargetParameters.ECSTaskParameters.PlatformVersion
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.PropagateTags != nil {
-				f10f2.PropagateTags = svcsdktypes.PropagateTags(*r.ko.Spec.TargetParameters.ECSTaskParameters.PropagateTags)
+				f11f2.PropagateTags = svcsdktypes.PropagateTags(*r.ko.Spec.TargetParameters.ECSTaskParameters.PropagateTags)
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.ReferenceID != nil {
-				f10f2.ReferenceId = r.ko.Spec.TargetParameters.ECSTaskParameters.ReferenceID
+				f11f2.ReferenceId = r.ko.Spec.TargetParameters.ECSTaskParameters.ReferenceID
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.Tags != nil {
-				f10f2f12 := []svcsdktypes.Tag{}
-				for _, f10f2f12iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Tags {
-					f10f2f12elem := &svcsdktypes.Tag{}
-					if f10f2f12iter.Key != nil {
-						f10f2f12elem.Key = f10f2f12iter.Key
+				f11f2f12 := []svcsdktypes.Tag{}
+				for _, f11f2f12iter := range r.ko.Spec.TargetParameters.ECSTaskParameters.Tags {
+					f11f2f12elem := &svcsdktypes.Tag{}
+					if f11f2f12iter.Key != nil {
+						f11f2f12elem.Key = f11f2f12iter.Key
 					}
-					if f10f2f12iter.Value != nil {
-						f10f2f12elem.Value = f10f2f12iter.Value
+					if f11f2f12iter.Value != nil {
+						f11f2f12elem.Value = f11f2f12iter.Value
 					}
-					f10f2f12 = append(f10f2f12, *f10f2f12elem)
+					f11f2f12 = append(f11f2f12, *f11f2f12elem)
 				}
-				f10f2.Tags = f10f2f12
+				f11f2.Tags = f11f2f12
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.TaskCount != nil {
 				taskCountCopy0 := *r.ko.Spec.TargetParameters.ECSTaskParameters.TaskCount
@@ -1712,120 +1806,120 @@ func (rm *resourceManager) newCreateRequestPayload(
 					return nil, fmt.Errorf("error: field TaskCount is of type int32")
 				}
 				taskCountCopy := int32(taskCountCopy0)
-				f10f2.TaskCount = &taskCountCopy
+				f11f2.TaskCount = &taskCountCopy
 			}
 			if r.ko.Spec.TargetParameters.ECSTaskParameters.TaskDefinitionARN != nil {
-				f10f2.TaskDefinitionArn = r.ko.Spec.TargetParameters.ECSTaskParameters.TaskDefinitionARN
+				f11f2.TaskDefinitionArn = r.ko.Spec.TargetParameters.ECSTaskParameters.TaskDefinitionARN
 			}
-			f10.EcsTaskParameters = f10f2
+			f11.EcsTaskParameters = f11f2
 		}
 		if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters != nil {
-			f10f3 := &svcsdktypes.PipeTargetEventBridgeEventBusParameters{}
+			f11f3 := &svcsdktypes.PipeTargetEventBridgeEventBusParameters{}
 			if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.DetailType != nil {
-				f10f3.DetailType = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.DetailType
+				f11f3.DetailType = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.DetailType
 			}
 			if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.EndpointID != nil {
-				f10f3.EndpointId = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.EndpointID
+				f11f3.EndpointId = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.EndpointID
 			}
 			if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Resources != nil {
-				f10f3.Resources = aws.ToStringSlice(r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Resources)
+				f11f3.Resources = aws.ToStringSlice(r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Resources)
 			}
 			if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Source != nil {
-				f10f3.Source = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Source
+				f11f3.Source = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Source
 			}
 			if r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Time != nil {
-				f10f3.Time = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Time
+				f11f3.Time = r.ko.Spec.TargetParameters.EventBridgeEventBusParameters.Time
 			}
-			f10.EventBridgeEventBusParameters = f10f3
+			f11.EventBridgeEventBusParameters = f11f3
 		}
 		if r.ko.Spec.TargetParameters.HTTPParameters != nil {
-			f10f4 := &svcsdktypes.PipeTargetHttpParameters{}
+			f11f4 := &svcsdktypes.PipeTargetHttpParameters{}
 			if r.ko.Spec.TargetParameters.HTTPParameters.HeaderParameters != nil {
-				f10f4.HeaderParameters = aws.ToStringMap(r.ko.Spec.TargetParameters.HTTPParameters.HeaderParameters)
+				f11f4.HeaderParameters = aws.ToStringMap(r.ko.Spec.TargetParameters.HTTPParameters.HeaderParameters)
 			}
 			if r.ko.Spec.TargetParameters.HTTPParameters.PathParameterValues != nil {
-				f10f4.PathParameterValues = aws.ToStringSlice(r.ko.Spec.TargetParameters.HTTPParameters.PathParameterValues)
+				f11f4.PathParameterValues = aws.ToStringSlice(r.ko.Spec.TargetParameters.HTTPParameters.PathParameterValues)
 			}
 			if r.ko.Spec.TargetParameters.HTTPParameters.QueryStringParameters != nil {
-				f10f4.QueryStringParameters = aws.ToStringMap(r.ko.Spec.TargetParameters.HTTPParameters.QueryStringParameters)
+				f11f4.QueryStringParameters = aws.ToStringMap(r.ko.Spec.TargetParameters.HTTPParameters.QueryStringParameters)
 			}
-			f10.HttpParameters = f10f4
+			f11.HttpParameters = f11f4
 		}
 		if r.ko.Spec.TargetParameters.InputTemplate != nil {
-			f10.InputTemplate = r.ko.Spec.TargetParameters.InputTemplate
+			f11.InputTemplate = r.ko.Spec.TargetParameters.InputTemplate
 		}
 		if r.ko.Spec.TargetParameters.KinesisStreamParameters != nil {
-			f10f6 := &svcsdktypes.PipeTargetKinesisStreamParameters{}
+			f11f6 := &svcsdktypes.PipeTargetKinesisStreamParameters{}
 			if r.ko.Spec.TargetParameters.KinesisStreamParameters.PartitionKey != nil {
-				f10f6.PartitionKey = r.ko.Spec.TargetParameters.KinesisStreamParameters.PartitionKey
+				f11f6.PartitionKey = r.ko.Spec.TargetParameters.KinesisStreamParameters.PartitionKey
 			}
-			f10.KinesisStreamParameters = f10f6
+			f11.KinesisStreamParameters = f11f6
 		}
 		if r.ko.Spec.TargetParameters.LambdaFunctionParameters != nil {
-			f10f7 := &svcsdktypes.PipeTargetLambdaFunctionParameters{}
+			f11f7 := &svcsdktypes.PipeTargetLambdaFunctionParameters{}
 			if r.ko.Spec.TargetParameters.LambdaFunctionParameters.InvocationType != nil {
-				f10f7.InvocationType = svcsdktypes.PipeTargetInvocationType(*r.ko.Spec.TargetParameters.LambdaFunctionParameters.InvocationType)
+				f11f7.InvocationType = svcsdktypes.PipeTargetInvocationType(*r.ko.Spec.TargetParameters.LambdaFunctionParameters.InvocationType)
 			}
-			f10.LambdaFunctionParameters = f10f7
+			f11.LambdaFunctionParameters = f11f7
 		}
 		if r.ko.Spec.TargetParameters.RedshiftDataParameters != nil {
-			f10f8 := &svcsdktypes.PipeTargetRedshiftDataParameters{}
+			f11f8 := &svcsdktypes.PipeTargetRedshiftDataParameters{}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.Database != nil {
-				f10f8.Database = r.ko.Spec.TargetParameters.RedshiftDataParameters.Database
+				f11f8.Database = r.ko.Spec.TargetParameters.RedshiftDataParameters.Database
 			}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.DBUser != nil {
-				f10f8.DbUser = r.ko.Spec.TargetParameters.RedshiftDataParameters.DBUser
+				f11f8.DbUser = r.ko.Spec.TargetParameters.RedshiftDataParameters.DBUser
 			}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.SecretManagerARN != nil {
-				f10f8.SecretManagerArn = r.ko.Spec.TargetParameters.RedshiftDataParameters.SecretManagerARN
+				f11f8.SecretManagerArn = r.ko.Spec.TargetParameters.RedshiftDataParameters.SecretManagerARN
 			}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.SQLs != nil {
-				f10f8.Sqls = aws.ToStringSlice(r.ko.Spec.TargetParameters.RedshiftDataParameters.SQLs)
+				f11f8.Sqls = aws.ToStringSlice(r.ko.Spec.TargetParameters.RedshiftDataParameters.SQLs)
 			}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.StatementName != nil {
-				f10f8.StatementName = r.ko.Spec.TargetParameters.RedshiftDataParameters.StatementName
+				f11f8.StatementName = r.ko.Spec.TargetParameters.RedshiftDataParameters.StatementName
 			}
 			if r.ko.Spec.TargetParameters.RedshiftDataParameters.WithEvent != nil {
-				f10f8.WithEvent = *r.ko.Spec.TargetParameters.RedshiftDataParameters.WithEvent
+				f11f8.WithEvent = *r.ko.Spec.TargetParameters.RedshiftDataParameters.WithEvent
 			}
-			f10.RedshiftDataParameters = f10f8
+			f11.RedshiftDataParameters = f11f8
 		}
 		if r.ko.Spec.TargetParameters.SageMakerPipelineParameters != nil {
-			f10f9 := &svcsdktypes.PipeTargetSageMakerPipelineParameters{}
+			f11f9 := &svcsdktypes.PipeTargetSageMakerPipelineParameters{}
 			if r.ko.Spec.TargetParameters.SageMakerPipelineParameters.PipelineParameterList != nil {
-				f10f9f0 := []svcsdktypes.SageMakerPipelineParameter{}
-				for _, f10f9f0iter := range r.ko.Spec.TargetParameters.SageMakerPipelineParameters.PipelineParameterList {
-					f10f9f0elem := &svcsdktypes.SageMakerPipelineParameter{}
-					if f10f9f0iter.Name != nil {
-						f10f9f0elem.Name = f10f9f0iter.Name
+				f11f9f0 := []svcsdktypes.SageMakerPipelineParameter{}
+				for _, f11f9f0iter := range r.ko.Spec.TargetParameters.SageMakerPipelineParameters.PipelineParameterList {
+					f11f9f0elem := &svcsdktypes.SageMakerPipelineParameter{}
+					if f11f9f0iter.Name != nil {
+						f11f9f0elem.Name = f11f9f0iter.Name
 					}
-					if f10f9f0iter.Value != nil {
-						f10f9f0elem.Value = f10f9f0iter.Value
+					if f11f9f0iter.Value != nil {
+						f11f9f0elem.Value = f11f9f0iter.Value
 					}
-					f10f9f0 = append(f10f9f0, *f10f9f0elem)
+					f11f9f0 = append(f11f9f0, *f11f9f0elem)
 				}
-				f10f9.PipelineParameterList = f10f9f0
+				f11f9.PipelineParameterList = f11f9f0
 			}
-			f10.SageMakerPipelineParameters = f10f9
+			f11.SageMakerPipelineParameters = f11f9
 		}
 		if r.ko.Spec.TargetParameters.SQSQueueParameters != nil {
-			f10f10 := &svcsdktypes.PipeTargetSqsQueueParameters{}
+			f11f10 := &svcsdktypes.PipeTargetSqsQueueParameters{}
 			if r.ko.Spec.TargetParameters.SQSQueueParameters.MessageDeduplicationID != nil {
-				f10f10.MessageDeduplicationId = r.ko.Spec.TargetParameters.SQSQueueParameters.MessageDeduplicationID
+				f11f10.MessageDeduplicationId = r.ko.Spec.TargetParameters.SQSQueueParameters.MessageDeduplicationID
 			}
 			if r.ko.Spec.TargetParameters.SQSQueueParameters.MessageGroupID != nil {
-				f10f10.MessageGroupId = r.ko.Spec.TargetParameters.SQSQueueParameters.MessageGroupID
+				f11f10.MessageGroupId = r.ko.Spec.TargetParameters.SQSQueueParameters.MessageGroupID
 			}
-			f10.SqsQueueParameters = f10f10
+			f11.SqsQueueParameters = f11f10
 		}
 		if r.ko.Spec.TargetParameters.StepFunctionStateMachineParameters != nil {
-			f10f11 := &svcsdktypes.PipeTargetStateMachineParameters{}
+			f11f11 := &svcsdktypes.PipeTargetStateMachineParameters{}
 			if r.ko.Spec.TargetParameters.StepFunctionStateMachineParameters.InvocationType != nil {
-				f10f11.InvocationType = svcsdktypes.PipeTargetInvocationType(*r.ko.Spec.TargetParameters.StepFunctionStateMachineParameters.InvocationType)
+				f11f11.InvocationType = svcsdktypes.PipeTargetInvocationType(*r.ko.Spec.TargetParameters.StepFunctionStateMachineParameters.InvocationType)
 			}
-			f10.StepFunctionStateMachineParameters = f10f11
+			f11.StepFunctionStateMachineParameters = f11f11
 		}
-		res.TargetParameters = f10
+		res.TargetParameters = f11
 	}
 
 	return res, nil
@@ -1965,6 +2059,52 @@ func (rm *resourceManager) newUpdateRequestPayload(
 			f3.InputTemplate = r.ko.Spec.EnrichmentParameters.InputTemplate
 		}
 		res.EnrichmentParameters = f3
+	}
+	if r.ko.Spec.LogConfiguration != nil {
+		f5 := &svcsdktypes.PipeLogConfigurationParameters{}
+		if r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			f5f0 := &svcsdktypes.CloudwatchLogsLogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != nil {
+				f5f0.LogGroupArn = r.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN
+			}
+			f5.CloudwatchLogsLogDestination = f5f0
+		}
+		if r.ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			f5f1 := &svcsdktypes.FirehoseLogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != nil {
+				f5f1.DeliveryStreamArn = r.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN
+			}
+			f5.FirehoseLogDestination = f5f1
+		}
+		if r.ko.Spec.LogConfiguration.IncludeExecutionData != nil {
+			f5f2 := []svcsdktypes.IncludeExecutionDataOption{}
+			for _, f5f2iter := range r.ko.Spec.LogConfiguration.IncludeExecutionData {
+				var f5f2elem string
+				f5f2elem = string(*f5f2iter)
+				f5f2 = append(f5f2, svcsdktypes.IncludeExecutionDataOption(f5f2elem))
+			}
+			f5.IncludeExecutionData = f5f2
+		}
+		if r.ko.Spec.LogConfiguration.Level != nil {
+			f5.Level = svcsdktypes.LogLevel(*r.ko.Spec.LogConfiguration.Level)
+		}
+		if r.ko.Spec.LogConfiguration.S3LogDestination != nil {
+			f5f4 := &svcsdktypes.S3LogDestinationParameters{}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.BucketName != nil {
+				f5f4.BucketName = r.ko.Spec.LogConfiguration.S3LogDestination.BucketName
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner != nil {
+				f5f4.BucketOwner = r.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat != nil {
+				f5f4.OutputFormat = svcsdktypes.S3OutputFormat(*r.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat)
+			}
+			if r.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil {
+				f5f4.Prefix = r.ko.Spec.LogConfiguration.S3LogDestination.Prefix
+			}
+			f5.S3LogDestination = f5f4
+		}
+		res.LogConfiguration = f5
 	}
 	if r.ko.Spec.Name != nil {
 		res.Name = r.ko.Spec.Name

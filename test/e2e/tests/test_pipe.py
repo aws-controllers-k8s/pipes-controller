@@ -177,3 +177,64 @@ class TestPipe:
 
         # Check pipe doesn't exist
         assert not pipes_validator.pipe_exists(pipe_name)
+
+    def test_pipe_log_configuration(self, pipes_client):
+        resource_name = random_suffix_name("ack-test-pipe-log", 24)
+
+        resources = get_bootstrap_resources()
+        # The CloudWatch describe API returns the log group ARN with a trailing
+        # ":*" wildcard; EventBridge Pipes expects the bare log group ARN.
+        log_group_arn = resources.LogGroup.arn.removesuffix(":*")
+
+        replacements = REPLACEMENT_VALUES.copy()
+        replacements["PIPE_NAME"] = resource_name
+        replacements["PIPE_ROLE_ARN"] = resources.PipeRole.arn
+        replacements["SOURCE_ARN"] = resources.SourceQueue.arn
+        replacements["TARGET_ARN"] = resources.TargetQueue.arn
+        replacements["LOG_GROUP_ARN"] = log_group_arn
+        replacements["LOG_LEVEL"] = "INFO"
+
+        resource_data = load_pipes_resource(
+            "pipe_log_configuration",
+            additional_replacements=replacements,
+        )
+        logging.debug(resource_data)
+
+        ref = k8s.CustomResourceReference(
+            CRD_GROUP, CRD_VERSION, RESOURCE_PLURAL,
+            resource_name, namespace="default",
+        )
+        k8s.create_custom_resource(ref, resource_data)
+        time.sleep(CREATE_WAIT_AFTER_SECONDS)
+
+        cr = k8s.wait_resource_consumed_by_controller(ref)
+        assert cr is not None
+        assert k8s.get_resource_exists(ref)
+
+        pipes_validator = PipesValidator(pipes_client)
+        pipe = pipes_validator.get_pipe(resource_name)
+        assert pipe is not None
+
+        # The log configuration should have been applied at creation time.
+        log_config = pipe["LogConfiguration"]
+        assert log_config["Level"] == "INFO"
+        assert log_config["CloudwatchLogsLogDestination"]["LogGroupArn"].startswith(
+            log_group_arn
+        )
+
+        # Update the log level; this is applied via UpdatePipe.
+        cr["spec"]["logConfiguration"]["level"] = "ERROR"
+        k8s.patch_custom_resource(ref, cr)
+        time.sleep(UPDATE_WAIT_AFTER_SECONDS)
+
+        pipe = pipes_validator.get_pipe(resource_name)
+        assert pipe["LogConfiguration"]["Level"] == "ERROR"
+
+        # Delete k8s resource
+        _, deleted = k8s.delete_custom_resource(ref, 15, 15)
+        assert deleted is True
+
+        time.sleep(DELETE_WAIT_AFTER_SECONDS)
+
+        # Check pipe doesn't exist
+        assert not pipes_validator.pipe_exists(resource_name)

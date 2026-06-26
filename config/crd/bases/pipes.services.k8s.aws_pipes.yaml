@@ -108,6 +108,43 @@ spec:
                   inputTemplate:
                     type: string
                 type: object
+              logConfiguration:
+                description: The logging configuration settings for the pipe.
+                properties:
+                  cloudwatchLogsLogDestination:
+                    description: The Amazon CloudWatch Logs logging configuration
+                      settings for the pipe.
+                    properties:
+                      logGroupARN:
+                        type: string
+                    type: object
+                  firehoseLogDestination:
+                    description: The Amazon Data Firehose logging configuration settings
+                      for the pipe.
+                    properties:
+                      deliveryStreamARN:
+                        type: string
+                    type: object
+                  includeExecutionData:
+                    items:
+                      type: string
+                    type: array
+                  level:
+                    type: string
+                  s3LogDestination:
+                    description: The Amazon S3 logging configuration settings for
+                      the pipe.
+                    properties:
+                      bucketName:
+                        type: string
+                      bucketOwner:
+                        type: string
+                      outputFormat:
+                        type: string
+                      prefix:
+                        type: string
+                    type: object
+                type: object
               name:
                 description: |-
                   The name of the pipe.

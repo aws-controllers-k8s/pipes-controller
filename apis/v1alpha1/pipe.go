@@ -39,6 +39,8 @@ type PipeSpec struct {
 	Enrichment *string `json:"enrichment,omitempty"`
 	// The parameters required to set up enrichment on your pipe.
 	EnrichmentParameters *PipeEnrichmentParameters `json:"enrichmentParameters,omitempty"`
+	// The logging configuration settings for the pipe.
+	LogConfiguration *PipeLogConfigurationParameters `json:"logConfiguration,omitempty"`
 	// The name of the pipe.
 	//
 	// Regex Pattern: `^[\.\-_A-Za-z0-9]+$`
