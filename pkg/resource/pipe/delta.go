@@ -56,6 +56,71 @@ func newResourceDelta(
 			delta.Add("Spec.Enrichment", a.ko.Spec.Enrichment, b.ko.Spec.Enrichment)
 		}
 	}
+	if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration, b.ko.Spec.LogConfiguration) {
+		delta.Add("Spec.LogConfiguration", a.ko.Spec.LogConfiguration, b.ko.Spec.LogConfiguration)
+	} else if a.ko.Spec.LogConfiguration != nil && b.ko.Spec.LogConfiguration != nil {
+		if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination, b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination) {
+			delta.Add("Spec.LogConfiguration.CloudwatchLogsLogDestination", a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination, b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination)
+		} else if a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil && b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN, b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN) {
+				delta.Add("Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN", a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN, b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN)
+			} else if a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != nil && b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != nil {
+				if *a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != *b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN {
+					delta.Add("Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN", a.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN, b.ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN)
+				}
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.FirehoseLogDestination, b.ko.Spec.LogConfiguration.FirehoseLogDestination) {
+			delta.Add("Spec.LogConfiguration.FirehoseLogDestination", a.ko.Spec.LogConfiguration.FirehoseLogDestination, b.ko.Spec.LogConfiguration.FirehoseLogDestination)
+		} else if a.ko.Spec.LogConfiguration.FirehoseLogDestination != nil && b.ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN, b.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN) {
+				delta.Add("Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN", a.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN, b.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN)
+			} else if a.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != nil && b.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != nil {
+				if *a.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != *b.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN {
+					delta.Add("Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN", a.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN, b.ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN)
+				}
+			}
+		}
+		if len(a.ko.Spec.LogConfiguration.IncludeExecutionData) != len(b.ko.Spec.LogConfiguration.IncludeExecutionData) {
+			delta.Add("Spec.LogConfiguration.IncludeExecutionData", a.ko.Spec.LogConfiguration.IncludeExecutionData, b.ko.Spec.LogConfiguration.IncludeExecutionData)
+		} else if len(a.ko.Spec.LogConfiguration.IncludeExecutionData) > 0 {
+			if !ackcompare.SliceStringPEqual(a.ko.Spec.LogConfiguration.IncludeExecutionData, b.ko.Spec.LogConfiguration.IncludeExecutionData) {
+				delta.Add("Spec.LogConfiguration.IncludeExecutionData", a.ko.Spec.LogConfiguration.IncludeExecutionData, b.ko.Spec.LogConfiguration.IncludeExecutionData)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.Level, b.ko.Spec.LogConfiguration.Level) {
+			delta.Add("Spec.LogConfiguration.Level", a.ko.Spec.LogConfiguration.Level, b.ko.Spec.LogConfiguration.Level)
+		} else if a.ko.Spec.LogConfiguration.Level != nil && b.ko.Spec.LogConfiguration.Level != nil {
+			if *a.ko.Spec.LogConfiguration.Level != *b.ko.Spec.LogConfiguration.Level {
+				delta.Add("Spec.LogConfiguration.Level", a.ko.Spec.LogConfiguration.Level, b.ko.Spec.LogConfiguration.Level)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination, b.ko.Spec.LogConfiguration.S3LogDestination) {
+			delta.Add("Spec.LogConfiguration.S3LogDestination", a.ko.Spec.LogConfiguration.S3LogDestination, b.ko.Spec.LogConfiguration.S3LogDestination)
+		} else if a.ko.Spec.LogConfiguration.S3LogDestination != nil && b.ko.Spec.LogConfiguration.S3LogDestination != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination.BucketName, b.ko.Spec.LogConfiguration.S3LogDestination.BucketName) {
+				delta.Add("Spec.LogConfiguration.S3LogDestination.BucketName", a.ko.Spec.LogConfiguration.S3LogDestination.BucketName, b.ko.Spec.LogConfiguration.S3LogDestination.BucketName)
+			} else if a.ko.Spec.LogConfiguration.S3LogDestination.BucketName != nil && b.ko.Spec.LogConfiguration.S3LogDestination.BucketName != nil {
+				if *a.ko.Spec.LogConfiguration.S3LogDestination.BucketName != *b.ko.Spec.LogConfiguration.S3LogDestination.BucketName {
+					delta.Add("Spec.LogConfiguration.S3LogDestination.BucketName", a.ko.Spec.LogConfiguration.S3LogDestination.BucketName, b.ko.Spec.LogConfiguration.S3LogDestination.BucketName)
+				}
+			}
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner, b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner) {
+				delta.Add("Spec.LogConfiguration.S3LogDestination.BucketOwner", a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner, b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner)
+			} else if a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner != nil && b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner != nil {
+				if *a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner != *b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner {
+					delta.Add("Spec.LogConfiguration.S3LogDestination.BucketOwner", a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner, b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner)
+				}
+			}
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination.Prefix, b.ko.Spec.LogConfiguration.S3LogDestination.Prefix) {
+				delta.Add("Spec.LogConfiguration.S3LogDestination.Prefix", a.ko.Spec.LogConfiguration.S3LogDestination.Prefix, b.ko.Spec.LogConfiguration.S3LogDestination.Prefix)
+			} else if a.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil && b.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil {
+				if *a.ko.Spec.LogConfiguration.S3LogDestination.Prefix != *b.ko.Spec.LogConfiguration.S3LogDestination.Prefix {
+					delta.Add("Spec.LogConfiguration.S3LogDestination.Prefix", a.ko.Spec.LogConfiguration.S3LogDestination.Prefix, b.ko.Spec.LogConfiguration.S3LogDestination.Prefix)
+				}
+			}
+		}
+	}
 	if ackcompare.HasNilDifference(a.ko.Spec.Name, b.ko.Spec.Name) {
 		delta.Add("Spec.Name", a.ko.Spec.Name, b.ko.Spec.Name)
 	} else if a.ko.Spec.Name != nil && b.ko.Spec.Name != nil {

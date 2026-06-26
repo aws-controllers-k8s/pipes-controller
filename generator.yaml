@@ -3,7 +3,6 @@ ignore:
       # - Pipe
   field_paths:
   - CreatePipeInput.KmsKeyIdentifier
-  - CreatePipeInput.LogConfiguration
   - PipeTargetParameters.TimestreamParameters
 sdk_names:
   client_struct: Pipes
@@ -21,6 +20,13 @@ resources:
         compare:
           is_ignored: true
       EnrichmentParameters:
+        compare:
+          is_ignored: true
+      # EventBridge currently only supports "json" for the S3 log output format
+      # and returns it on read even when the user leaves it unset, which would
+      # otherwise produce a perpetual delta. Keep the field settable but exclude
+      # it from the delta comparison.
+      LogConfiguration.S3LogDestination.OutputFormat:
         compare:
           is_ignored: true
       StateReason:

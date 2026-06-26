@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from acktest.bootstrapping import Resources
 from acktest.bootstrapping.iam import Role
 from acktest.bootstrapping.sqs import Queue
+from acktest.bootstrapping.cloudwatch import LogGroup
 
 from e2e import bootstrap_directory
 
@@ -27,6 +28,7 @@ class BootstrapResources(Resources):
     PipeRole: Role
     SourceQueue: Queue
     TargetQueue: Queue
+    LogGroup: LogGroup
 
 _bootstrap_resources = None
 

@@ -1373,6 +1373,11 @@ func (in *PipeSpec) DeepCopyInto(out *PipeSpec) {
 		*out = new(PipeEnrichmentParameters)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LogConfiguration != nil {
+		in, out := &in.LogConfiguration, &out.LogConfiguration
+		*out = new(PipeLogConfigurationParameters)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Name != nil {
 		in, out := &in.Name, &out.Name
 		*out = new(string)
