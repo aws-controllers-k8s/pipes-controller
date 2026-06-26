@@ -17,13 +17,36 @@ package pipe
 
 import (
 	"context"
+	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	ec2apitypes "github.com/aws-controllers-k8s/ec2-controller/apis/v1alpha1"
+	iamapitypes "github.com/aws-controllers-k8s/iam-controller/apis/v1alpha1"
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
+	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	ackrt "github.com/aws-controllers-k8s/runtime/pkg/runtime"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/pipes-controller/apis/v1alpha1"
 )
+
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles,verbs=get;list
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=ec2.services.k8s.aws,resources=subnets,verbs=get;list
+// +kubebuilder:rbac:groups=ec2.services.k8s.aws,resources=subnets/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=ec2.services.k8s.aws,resources=securitygroups,verbs=get;list
+// +kubebuilder:rbac:groups=ec2.services.k8s.aws,resources=securitygroups/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles,verbs=get;list
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles,verbs=get;list
+// +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles/status,verbs=get;list
 
 // ClearResolvedReferences removes any reference values that were made
 // concrete in the spec. It returns a copy of the input AWSResource which
@@ -31,6 +54,52 @@ import (
 // values.
 func (rm *resourceManager) ClearResolvedReferences(res acktypes.AWSResource) acktypes.AWSResource {
 	ko := rm.concreteResource(res).ko.DeepCopy()
+
+	if ko.Spec.RoleRef != nil {
+		ko.Spec.RoleARN = nil
+	}
+
+	if ko.Spec.SourceParameters != nil {
+		if ko.Spec.SourceParameters.SelfManagedKafkaParameters != nil {
+			if ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC != nil {
+				if len(ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs) > 0 {
+					ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets = nil
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration != nil {
+					if len(ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs) > 0 {
+						ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups = nil
+					}
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef != nil {
+					ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN = nil
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef != nil {
+					ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN = nil
+				}
+			}
+		}
+	}
 
 	return &resource{ko}
 }
@@ -47,11 +116,477 @@ func (rm *resourceManager) ResolveReferences(
 	apiReader client.Reader,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, bool, error) {
-	return res, false, nil
+	ko := rm.concreteResource(res).ko
+
+	resourceHasReferences := false
+	err := validateReferenceFields(ko)
+	if fieldHasReferences, err := rm.resolveReferenceForRoleARN(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	if fieldHasReferences, err := rm.resolveReferenceForSourceParameters_SelfManagedKafkaParameters_VPC_Subnets(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	if fieldHasReferences, err := rm.resolveReferenceForTargetParameters_ECSTaskParameters_NetworkConfiguration_AWSVPCConfiguration_SecurityGroups(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	if fieldHasReferences, err := rm.resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_ExecutionRoleARN(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	if fieldHasReferences, err := rm.resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_TaskRoleARN(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	return &resource{ko}, resourceHasReferences, err
 }
 
 // validateReferenceFields validates the reference field and corresponding
 // identifier field.
 func validateReferenceFields(ko *svcapitypes.Pipe) error {
+
+	if ko.Spec.RoleRef != nil && ko.Spec.RoleARN != nil {
+		return ackerr.ResourceReferenceAndIDNotSupportedFor("RoleARN", "RoleRef")
+	}
+	if ko.Spec.RoleRef == nil && ko.Spec.RoleARN == nil {
+		return ackerr.ResourceReferenceOrIDRequiredFor("RoleARN", "RoleRef")
+	}
+
+	if ko.Spec.SourceParameters != nil {
+		if ko.Spec.SourceParameters.SelfManagedKafkaParameters != nil {
+			if ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC != nil {
+				if len(ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs) > 0 && len(ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets) > 0 {
+					return ackerr.ResourceReferenceAndIDNotSupportedFor("SourceParameters.SelfManagedKafkaParameters.VPC.Subnets", "SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs")
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration != nil {
+					if len(ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs) > 0 && len(ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups) > 0 {
+						return ackerr.ResourceReferenceAndIDNotSupportedFor("TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups", "TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs")
+					}
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef != nil && ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN != nil {
+					return ackerr.ResourceReferenceAndIDNotSupportedFor("TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN", "TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef")
+				}
+			}
+		}
+	}
+
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef != nil && ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN != nil {
+					return ackerr.ResourceReferenceAndIDNotSupportedFor("TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN", "TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef")
+				}
+			}
+		}
+	}
 	return nil
+}
+
+// resolveReferenceForRoleARN reads the resource referenced
+// from RoleRef field and sets the RoleARN
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForRoleARN(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.RoleRef != nil && ko.Spec.RoleRef.From != nil {
+		hasReferences = true
+		arr := ko.Spec.RoleRef.From
+		if arr.Name == nil || *arr.Name == "" {
+			return hasReferences, fmt.Errorf("provided resource reference is nil or empty: RoleRef")
+		}
+		namespace, err := ackrt.ResolveCrossNamespaceReference(
+			ctx,
+			rm.cfg.EnableCrossNamespace,
+			&ko.Status.Conditions,
+			ackrt.CrossNamespaceRefKindResource,
+			ko.ObjectMeta.GetNamespace(),
+			arr.Namespace,
+			*arr.Name,
+		)
+		if err != nil {
+			return hasReferences, err
+		}
+		obj := &iamapitypes.Role{}
+		if err := getReferencedResourceState_Role(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+			return hasReferences, err
+		}
+		ko.Spec.RoleARN = (*string)(obj.Status.ACKResourceMetadata.ARN)
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_Role looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_Role(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *iamapitypes.Role,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"Role",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"Role",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"Role",
+			namespace, name)
+	}
+	if obj.Status.ACKResourceMetadata == nil || obj.Status.ACKResourceMetadata.ARN == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"Role",
+			namespace, name,
+			"Status.ACKResourceMetadata.ARN")
+	}
+	return nil
+}
+
+// resolveReferenceForSourceParameters_SelfManagedKafkaParameters_VPC_Subnets reads the resource referenced
+// from SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs field and sets the SourceParameters.SelfManagedKafkaParameters.VPC.Subnets
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForSourceParameters_SelfManagedKafkaParameters_VPC_Subnets(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.SourceParameters != nil {
+		if ko.Spec.SourceParameters.SelfManagedKafkaParameters != nil {
+			if ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC != nil {
+				for _, f0iter := range ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs {
+					if f0iter != nil && f0iter.From != nil {
+						hasReferences = true
+						arr := f0iter.From
+						if arr.Name == nil || *arr.Name == "" {
+							return hasReferences, fmt.Errorf("provided resource reference is nil or empty: SourceParameters.SelfManagedKafkaParameters.VPC.SubnetRefs")
+						}
+						namespace, err := ackrt.ResolveCrossNamespaceReference(
+							ctx,
+							rm.cfg.EnableCrossNamespace,
+							&ko.Status.Conditions,
+							ackrt.CrossNamespaceRefKindResource,
+							ko.ObjectMeta.GetNamespace(),
+							arr.Namespace,
+							*arr.Name,
+						)
+						if err != nil {
+							return hasReferences, err
+						}
+						obj := &ec2apitypes.Subnet{}
+						if err := getReferencedResourceState_Subnet(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+							return hasReferences, err
+						}
+						if ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets == nil {
+							ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets = make([]*string, 0, 1)
+						}
+						ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets = append(ko.Spec.SourceParameters.SelfManagedKafkaParameters.VPC.Subnets, (*string)(obj.Status.SubnetID))
+					}
+				}
+			}
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_Subnet looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_Subnet(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *ec2apitypes.Subnet,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"Subnet",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"Subnet",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"Subnet",
+			namespace, name)
+	}
+	if obj.Status.SubnetID == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"Subnet",
+			namespace, name,
+			"Status.SubnetID")
+	}
+	return nil
+}
+
+// resolveReferenceForTargetParameters_ECSTaskParameters_NetworkConfiguration_AWSVPCConfiguration_SecurityGroups reads the resource referenced
+// from TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs field and sets the TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForTargetParameters_ECSTaskParameters_NetworkConfiguration_AWSVPCConfiguration_SecurityGroups(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration != nil {
+					for _, f0iter := range ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs {
+						if f0iter != nil && f0iter.From != nil {
+							hasReferences = true
+							arr := f0iter.From
+							if arr.Name == nil || *arr.Name == "" {
+								return hasReferences, fmt.Errorf("provided resource reference is nil or empty: TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroupRefs")
+							}
+							namespace, err := ackrt.ResolveCrossNamespaceReference(
+								ctx,
+								rm.cfg.EnableCrossNamespace,
+								&ko.Status.Conditions,
+								ackrt.CrossNamespaceRefKindResource,
+								ko.ObjectMeta.GetNamespace(),
+								arr.Namespace,
+								*arr.Name,
+							)
+							if err != nil {
+								return hasReferences, err
+							}
+							obj := &ec2apitypes.SecurityGroup{}
+							if err := getReferencedResourceState_SecurityGroup(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+								return hasReferences, err
+							}
+							if ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups == nil {
+								ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups = make([]*string, 0, 1)
+							}
+							ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups = append(ko.Spec.TargetParameters.ECSTaskParameters.NetworkConfiguration.AWSVPCConfiguration.SecurityGroups, (*string)(obj.Status.ID))
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_SecurityGroup looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_SecurityGroup(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *ec2apitypes.SecurityGroup,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"SecurityGroup",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"SecurityGroup",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"SecurityGroup",
+			namespace, name)
+	}
+	if obj.Status.ID == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"SecurityGroup",
+			namespace, name,
+			"Status.ID")
+	}
+	return nil
+}
+
+// resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_ExecutionRoleARN reads the resource referenced
+// from TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef field and sets the TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_ExecutionRoleARN(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef != nil && ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef.From != nil {
+					hasReferences = true
+					arr := ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef.From
+					if arr.Name == nil || *arr.Name == "" {
+						return hasReferences, fmt.Errorf("provided resource reference is nil or empty: TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleRef")
+					}
+					namespace, err := ackrt.ResolveCrossNamespaceReference(
+						ctx,
+						rm.cfg.EnableCrossNamespace,
+						&ko.Status.Conditions,
+						ackrt.CrossNamespaceRefKindResource,
+						ko.ObjectMeta.GetNamespace(),
+						arr.Namespace,
+						*arr.Name,
+					)
+					if err != nil {
+						return hasReferences, err
+					}
+					obj := &iamapitypes.Role{}
+					if err := getReferencedResourceState_Role(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+						return hasReferences, err
+					}
+					ko.Spec.TargetParameters.ECSTaskParameters.Overrides.ExecutionRoleARN = (*string)(obj.Status.ACKResourceMetadata.ARN)
+				}
+			}
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_TaskRoleARN reads the resource referenced
+// from TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef field and sets the TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForTargetParameters_ECSTaskParameters_Overrides_TaskRoleARN(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.TargetParameters != nil {
+		if ko.Spec.TargetParameters.ECSTaskParameters != nil {
+			if ko.Spec.TargetParameters.ECSTaskParameters.Overrides != nil {
+				if ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef != nil && ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef.From != nil {
+					hasReferences = true
+					arr := ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef.From
+					if arr.Name == nil || *arr.Name == "" {
+						return hasReferences, fmt.Errorf("provided resource reference is nil or empty: TargetParameters.ECSTaskParameters.Overrides.TaskRoleRef")
+					}
+					namespace, err := ackrt.ResolveCrossNamespaceReference(
+						ctx,
+						rm.cfg.EnableCrossNamespace,
+						&ko.Status.Conditions,
+						ackrt.CrossNamespaceRefKindResource,
+						ko.ObjectMeta.GetNamespace(),
+						arr.Namespace,
+						*arr.Name,
+					)
+					if err != nil {
+						return hasReferences, err
+					}
+					obj := &iamapitypes.Role{}
+					if err := getReferencedResourceState_Role(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+						return hasReferences, err
+					}
+					ko.Spec.TargetParameters.ECSTaskParameters.Overrides.TaskRoleARN = (*string)(obj.Status.ACKResourceMetadata.ARN)
+				}
+			}
+		}
+	}
+
+	return hasReferences, nil
 }
