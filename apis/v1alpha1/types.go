@@ -101,6 +101,8 @@ type CloudwatchLogsLogDestination struct {
 // The Amazon CloudWatch Logs logging configuration settings for the pipe.
 type CloudwatchLogsLogDestinationParameters struct {
 	LogGroupARN *string `json:"logGroupARN,omitempty"`
+	// Reference field for LogGroupARN
+	LogGroupRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"logGroupRef,omitempty"`
 }
 
 // A DeadLetterConfig object that contains information about a dead-letter queue
@@ -238,6 +240,8 @@ type FirehoseLogDestination struct {
 // The Amazon Data Firehose logging configuration settings for the pipe.
 type FirehoseLogDestinationParameters struct {
 	DeliveryStreamARN *string `json:"deliveryStreamARN,omitempty"`
+	// Reference field for DeliveryStreamARN
+	DeliveryStreamRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"deliveryStreamRef,omitempty"`
 }
 
 // The Secrets Manager secret that stores your broker credentials.

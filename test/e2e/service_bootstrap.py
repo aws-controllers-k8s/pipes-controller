@@ -17,6 +17,7 @@ import logging
 from acktest.bootstrapping import Resources, BootstrapFailureException
 from acktest.bootstrapping.iam import Role
 from acktest.bootstrapping.sqs import Queue
+from acktest.bootstrapping.cloudwatch import LogGroup
 
 from e2e import bootstrap_directory
 from e2e.bootstrap_resources import BootstrapResources
@@ -27,14 +28,20 @@ def service_bootstrap() -> Resources:
     resources = BootstrapResources(
         PipeRole=Role(
             "ack-test-pipe-role",
-            "pipes.amazonaws.com", 
-            managed_policies=["arn:aws:iam::aws:policy/AmazonSQSFullAccess"],
+            "pipes.amazonaws.com",
+            managed_policies=[
+                "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+                "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+            ],
         ),
         SourceQueue=Queue(
             "ack-pipes-controller-source-queue"
         ),
         TargetQueue=Queue(
             "ack-pipes-controller-target-queue"
+        ),
+        LogGroup=LogGroup(
+            name_prefix="ack-pipes-controller-logs"
         ),
     )
 

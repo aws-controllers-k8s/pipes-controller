@@ -50,7 +50,7 @@ var (
 // +kubebuilder:rbac:groups=pipes.services.k8s.aws,resources=pipes,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=pipes.services.k8s.aws,resources=pipes/status,verbs=get;update;patch
 
-var lateInitializeFieldNames = []string{}
+var lateInitializeFieldNames = []string{"OutputFormat"}
 
 // resourceManager is responsible for providing a consistent way to perform
 // CRUD operations in a backend AWS service API for Book custom resources.
@@ -251,6 +251,14 @@ func (rm *resourceManager) LateInitialize(
 func (rm *resourceManager) incompleteLateInitialization(
 	res acktypes.AWSResource,
 ) bool {
+	ko := rm.concreteResource(res).ko.DeepCopy()
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.S3LogDestination != nil {
+			if ko.Spec.LogConfiguration.S3LogDestination.OutputFormat == nil {
+				return true
+			}
+		}
+	}
 	return false
 }
 
@@ -260,7 +268,16 @@ func (rm *resourceManager) lateInitializeFromReadOneOutput(
 	observed acktypes.AWSResource,
 	latest acktypes.AWSResource,
 ) acktypes.AWSResource {
-	return latest
+	observedKo := rm.concreteResource(observed).ko.DeepCopy()
+	latestKo := rm.concreteResource(latest).ko.DeepCopy()
+	if observedKo.Spec.LogConfiguration != nil && latestKo.Spec.LogConfiguration != nil {
+		if observedKo.Spec.LogConfiguration.S3LogDestination != nil && latestKo.Spec.LogConfiguration.S3LogDestination != nil {
+			if observedKo.Spec.LogConfiguration.S3LogDestination.OutputFormat != nil && latestKo.Spec.LogConfiguration.S3LogDestination.OutputFormat == nil {
+				latestKo.Spec.LogConfiguration.S3LogDestination.OutputFormat = observedKo.Spec.LogConfiguration.S3LogDestination.OutputFormat
+			}
+		}
+	}
+	return &resource{latestKo}
 }
 
 // IsSynced returns true if the resource is synced.
