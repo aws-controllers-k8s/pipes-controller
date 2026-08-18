@@ -113,6 +113,13 @@ func newResourceDelta(
 					delta.Add("Spec.LogConfiguration.S3LogDestination.BucketOwner", a.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner, b.ko.Spec.LogConfiguration.S3LogDestination.BucketOwner)
 				}
 			}
+			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat, b.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat) {
+				delta.Add("Spec.LogConfiguration.S3LogDestination.OutputFormat", a.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat, b.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat)
+			} else if a.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat != nil && b.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat != nil {
+				if *a.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat != *b.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat {
+					delta.Add("Spec.LogConfiguration.S3LogDestination.OutputFormat", a.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat, b.ko.Spec.LogConfiguration.S3LogDestination.OutputFormat)
+				}
+			}
 			if ackcompare.HasNilDifference(a.ko.Spec.LogConfiguration.S3LogDestination.Prefix, b.ko.Spec.LogConfiguration.S3LogDestination.Prefix) {
 				delta.Add("Spec.LogConfiguration.S3LogDestination.Prefix", a.ko.Spec.LogConfiguration.S3LogDestination.Prefix, b.ko.Spec.LogConfiguration.S3LogDestination.Prefix)
 			} else if a.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil && b.ko.Spec.LogConfiguration.S3LogDestination.Prefix != nil {

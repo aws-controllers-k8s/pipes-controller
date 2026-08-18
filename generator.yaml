@@ -1,9 +1,9 @@
 ignore:
   resource_names:
-      # - Pipe
+    # - Pipe
   field_paths:
-  - CreatePipeInput.KmsKeyIdentifier
-  - PipeTargetParameters.TimestreamParameters
+    - CreatePipeInput.KmsKeyIdentifier
+    - PipeTargetParameters.TimestreamParameters
 sdk_names:
   client_struct: Pipes
   client_interface: PipesAPI
@@ -27,13 +27,21 @@ resources:
       EnrichmentParameters:
         compare:
           is_ignored: true
-      # EventBridge currently only supports "json" for the S3 log output format
-      # and returns it on read even when the user leaves it unset, which would
-      # otherwise produce a perpetual delta. Keep the field settable but exclude
-      # it from the delta comparison.
+      LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN:
+        references:
+          resource: LogGroup
+          service_name: cloudwatchlogs
+          path: Status.ACKResourceMetadata.ARN
+      LogConfiguration.FirehoseLogDestination.DeliveryStreamARN:
+        references:
+          resource: DeliveryStream
+          service_name: firehose
+          path: Status.ACKResourceMetadata.ARN
+      # EventBridge defaults the S3 log output format to "json" and returns it
+      # on read even when the user leaves it unset, which would otherwise
+      # produce a perpetual delta.
       LogConfiguration.S3LogDestination.OutputFormat:
-        compare:
-          is_ignored: true
+        late_initialize: {}
       StateReason:
         is_read_only: true
         from:

@@ -70,6 +70,22 @@ rules:
   - list
   - watch
 - apiGroups:
+  - cloudwatchlogs.services.k8s.aws
+  resources:
+  - loggroups
+  - loggroups/status
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - firehose.services.k8s.aws
+  resources:
+  - deliverystreams
+  - deliverystreams/status
+  verbs:
+  - get
+  - list
+- apiGroups:
   - iam.services.k8s.aws
   resources:
   - roles

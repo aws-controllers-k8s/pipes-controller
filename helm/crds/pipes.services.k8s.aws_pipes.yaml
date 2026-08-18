@@ -117,6 +117,20 @@ spec:
                     properties:
                       logGroupARN:
                         type: string
+                      logGroupRef:
+                        description: Reference field for LogGroupARN
+                        properties:
+                          from:
+                            description: |-
+                              AWSResourceReference provides all the values necessary to reference another
+                              k8s resource for finding the identifier(Id/ARN/Name)
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                            type: object
+                        type: object
                     type: object
                   firehoseLogDestination:
                     description: The Amazon Data Firehose logging configuration settings
@@ -124,6 +138,20 @@ spec:
                     properties:
                       deliveryStreamARN:
                         type: string
+                      deliveryStreamRef:
+                        description: Reference field for DeliveryStreamARN
+                        properties:
+                          from:
+                            description: |-
+                              AWSResourceReference provides all the values necessary to reference another
+                              k8s resource for finding the identifier(Id/ARN/Name)
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                            type: object
+                        type: object
                     type: object
                   includeExecutionData:
                     items:

@@ -23,6 +23,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	cloudwatchlogsapitypes "github.com/aws-controllers-k8s/cloudwatchlogs-controller/apis/v1alpha1"
+	firehoseapitypes "github.com/aws-controllers-k8s/firehose-controller/apis/v1alpha1"
 	iamapitypes "github.com/aws-controllers-k8s/iam-controller/apis/v1alpha1"
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
@@ -31,6 +33,12 @@ import (
 
 	svcapitypes "github.com/aws-controllers-k8s/pipes-controller/apis/v1alpha1"
 )
+
+// +kubebuilder:rbac:groups=cloudwatchlogs.services.k8s.aws,resources=loggroups,verbs=get;list
+// +kubebuilder:rbac:groups=cloudwatchlogs.services.k8s.aws,resources=loggroups/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=firehose.services.k8s.aws,resources=deliverystreams,verbs=get;list
+// +kubebuilder:rbac:groups=firehose.services.k8s.aws,resources=deliverystreams/status,verbs=get;list
 
 // +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles,verbs=get;list
 // +kubebuilder:rbac:groups=iam.services.k8s.aws,resources=roles/status,verbs=get;list
@@ -41,6 +49,22 @@ import (
 // values.
 func (rm *resourceManager) ClearResolvedReferences(res acktypes.AWSResource) acktypes.AWSResource {
 	ko := rm.concreteResource(res).ko.DeepCopy()
+
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef != nil {
+				ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN = nil
+			}
+		}
+	}
+
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			if ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamRef != nil {
+				ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN = nil
+			}
+		}
+	}
 
 	if ko.Spec.RoleRef != nil {
 		ko.Spec.RoleARN = nil
@@ -65,6 +89,18 @@ func (rm *resourceManager) ResolveReferences(
 
 	resourceHasReferences := false
 	err := validateReferenceFields(ko)
+	if fieldHasReferences, err := rm.resolveReferenceForLogConfiguration_CloudwatchLogsLogDestination_LogGroupARN(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	if fieldHasReferences, err := rm.resolveReferenceForLogConfiguration_FirehoseLogDestination_DeliveryStreamARN(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
 	if fieldHasReferences, err := rm.resolveReferenceForRoleARN(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
@@ -78,11 +114,217 @@ func (rm *resourceManager) ResolveReferences(
 // identifier field.
 func validateReferenceFields(ko *svcapitypes.Pipe) error {
 
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef != nil && ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN != nil {
+				return ackerr.ResourceReferenceAndIDNotSupportedFor("LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN", "LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef")
+			}
+		}
+	}
+
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			if ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamRef != nil && ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN != nil {
+				return ackerr.ResourceReferenceAndIDNotSupportedFor("LogConfiguration.FirehoseLogDestination.DeliveryStreamARN", "LogConfiguration.FirehoseLogDestination.DeliveryStreamRef")
+			}
+		}
+	}
+
 	if ko.Spec.RoleRef != nil && ko.Spec.RoleARN != nil {
 		return ackerr.ResourceReferenceAndIDNotSupportedFor("RoleARN", "RoleRef")
 	}
 	if ko.Spec.RoleRef == nil && ko.Spec.RoleARN == nil {
 		return ackerr.ResourceReferenceOrIDRequiredFor("RoleARN", "RoleRef")
+	}
+	return nil
+}
+
+// resolveReferenceForLogConfiguration_CloudwatchLogsLogDestination_LogGroupARN reads the resource referenced
+// from LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef field and sets the LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForLogConfiguration_CloudwatchLogsLogDestination_LogGroupARN(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination != nil {
+			if ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef != nil && ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef.From != nil {
+				hasReferences = true
+				arr := ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef.From
+				if arr.Name == nil || *arr.Name == "" {
+					return hasReferences, fmt.Errorf("provided resource reference is nil or empty: LogConfiguration.CloudwatchLogsLogDestination.LogGroupRef")
+				}
+				namespace, err := ackrt.ResolveCrossNamespaceReference(
+					ctx,
+					rm.cfg.EnableCrossNamespace,
+					&ko.Status.Conditions,
+					ackrt.CrossNamespaceRefKindResource,
+					ko.ObjectMeta.GetNamespace(),
+					arr.Namespace,
+					*arr.Name,
+				)
+				if err != nil {
+					return hasReferences, err
+				}
+				obj := &cloudwatchlogsapitypes.LogGroup{}
+				if err := getReferencedResourceState_LogGroup(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+					return hasReferences, err
+				}
+				ko.Spec.LogConfiguration.CloudwatchLogsLogDestination.LogGroupARN = (*string)(obj.Status.ACKResourceMetadata.ARN)
+			}
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_LogGroup looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_LogGroup(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *cloudwatchlogsapitypes.LogGroup,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"LogGroup",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"LogGroup",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"LogGroup",
+			namespace, name)
+	}
+	if obj.Status.ACKResourceMetadata == nil || obj.Status.ACKResourceMetadata.ARN == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"LogGroup",
+			namespace, name,
+			"Status.ACKResourceMetadata.ARN")
+	}
+	return nil
+}
+
+// resolveReferenceForLogConfiguration_FirehoseLogDestination_DeliveryStreamARN reads the resource referenced
+// from LogConfiguration.FirehoseLogDestination.DeliveryStreamRef field and sets the LogConfiguration.FirehoseLogDestination.DeliveryStreamARN
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForLogConfiguration_FirehoseLogDestination_DeliveryStreamARN(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Pipe,
+) (hasReferences bool, err error) {
+	if ko.Spec.LogConfiguration != nil {
+		if ko.Spec.LogConfiguration.FirehoseLogDestination != nil {
+			if ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamRef != nil && ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamRef.From != nil {
+				hasReferences = true
+				arr := ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamRef.From
+				if arr.Name == nil || *arr.Name == "" {
+					return hasReferences, fmt.Errorf("provided resource reference is nil or empty: LogConfiguration.FirehoseLogDestination.DeliveryStreamRef")
+				}
+				namespace, err := ackrt.ResolveCrossNamespaceReference(
+					ctx,
+					rm.cfg.EnableCrossNamespace,
+					&ko.Status.Conditions,
+					ackrt.CrossNamespaceRefKindResource,
+					ko.ObjectMeta.GetNamespace(),
+					arr.Namespace,
+					*arr.Name,
+				)
+				if err != nil {
+					return hasReferences, err
+				}
+				obj := &firehoseapitypes.DeliveryStream{}
+				if err := getReferencedResourceState_DeliveryStream(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+					return hasReferences, err
+				}
+				ko.Spec.LogConfiguration.FirehoseLogDestination.DeliveryStreamARN = (*string)(obj.Status.ACKResourceMetadata.ARN)
+			}
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_DeliveryStream looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_DeliveryStream(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *firehoseapitypes.DeliveryStream,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"DeliveryStream",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"DeliveryStream",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"DeliveryStream",
+			namespace, name)
+	}
+	if obj.Status.ACKResourceMetadata == nil || obj.Status.ACKResourceMetadata.ARN == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"DeliveryStream",
+			namespace, name,
+			"Status.ACKResourceMetadata.ARN")
 	}
 	return nil
 }
