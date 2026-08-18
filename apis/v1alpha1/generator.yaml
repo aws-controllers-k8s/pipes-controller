@@ -10,6 +10,11 @@ sdk_names:
 resources:
   Pipe:
     fields:
+      RoleArn:
+        references:
+          resource: Role
+          service_name: iam
+          path: Status.ACKResourceMetadata.ARN
       DesiredState:
         compare:
           is_ignored: true

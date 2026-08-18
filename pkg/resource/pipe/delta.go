@@ -20,6 +20,7 @@ import (
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 // Hack to avoid import errors during build...
@@ -134,6 +135,9 @@ func newResourceDelta(
 		if *a.ko.Spec.RoleARN != *b.ko.Spec.RoleARN {
 			delta.Add("Spec.RoleARN", a.ko.Spec.RoleARN, b.ko.Spec.RoleARN)
 		}
+	}
+	if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.RoleRef, b.ko.Spec.RoleRef) {
+		delta.Add("Spec.RoleRef", a.ko.Spec.RoleRef, b.ko.Spec.RoleRef)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.Source, b.ko.Spec.Source) {
 		delta.Add("Spec.Source", a.ko.Spec.Source, b.ko.Spec.Source)
