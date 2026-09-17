@@ -3,7 +3,7 @@ module github.com/aws-controllers-k8s/pipes-controller
 go 1.25.0
 
 require (
-	github.com/aws-controllers-k8s/iam-controller v1.8.0
+	github.com/aws-controllers-k8s/iam-controller v1.9.0
 	github.com/aws-controllers-k8s/runtime v0.63.0
 	github.com/aws/aws-sdk-go-v2 v1.34.0
 	github.com/aws/aws-sdk-go-v2/service/pipes v1.18.10
@@ -17,7 +17,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.49.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.28.6 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.47 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.21 // indirect
